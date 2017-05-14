@@ -1,3 +1,0 @@
-# snejugal.github.io
-
-Hey
