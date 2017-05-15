@@ -1,8 +1,47 @@
 body {
-  margin: 0;
-  background-color: #eee;
-  padding: 24px;
-  font-size: 20px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  color: #424242;
+	margin: 0;
+	background-color: #eee;
+	padding: 24px;
+	font-size: 20px;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+	color: #424242;
+	box-sizing: border-box;
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
+	max-width: 512px;
+	margin: auto;
+}
+
+body.light-color {
+	color: rgba(255, 255, 255, .8);
+}
+
+body.dark-color {
+	color: rgba(0, 0, 0, .8);
+}
+
+input {
+	background: rgba(255, 255, 255, .95);
+	border: 1px solid rgba(0, 0, 0, .125);
+	box-shadow: 0 2px 2px rgba(0, 0, 0, .025);
+	color: #212121;
+	font-size: 24px;
+	padding: 24px;
+	caret-color: #424242;
+	width: 100%;
+	margin: 18px 0 36px;
+	border-radius: 2px;
+	font-family: inherit;
+   box-sizing: border-box;
+}
+
+.output span {
+	display: block;
+	line-height: 1.5;
+}
+
+footer {
+	opacity: .5;
+	margin-top: auto;
 }
