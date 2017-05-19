@@ -28,6 +28,7 @@ int.addEventListener("keydown", () => {
 			green = parseInt(green, 16);
 			blue = parseInt(blue, 16);
 			output.rgba.innerHTML = "rgb(" + red + ", " + green + ", " + blue + ")";
+			body.style.backgroundColor = "rgb("+ red + ", " + green + ", " + blue + ")";
 		} else {
 			output.hex.innerHTML = "#" + alpha + red + green + blue;
 			red = parseInt(red, 16);
@@ -35,9 +36,8 @@ int.addEventListener("keydown", () => {
 			blue = parseInt(blue, 16);
 			alpha = parseInt(alpha, 16);
 			output.rgba.innerHTML = "rgba("+ red + ", " + green + ", " + blue + ", " + alpha + ") (alpha from 0 to 255)";
+			body.style.backgroundColor = "rgba("+ red + ", " + green + ", " + blue + ", " + (alpha / 256) + ")";
 		}
-
-		body.style.backgroundColor = "rgba("+ red + ", " + green + ", " + blue + ", " + (alpha / 256) + ")";
 		theme_color.content = "rgb(" + red + ", " + green + ", " + blue + ")";
 
 		if (red > 128 || green > 128 || blue > 128 || alpha < 128) {
