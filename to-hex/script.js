@@ -34,11 +34,11 @@ int.addEventListener("keydown", () => {
 			green = parseInt(green, 16);
 			blue = parseInt(blue, 16);
 			alpha = parseInt(alpha, 16);
-			output.rgba.innerHTML = "rgba("+ red + ", " + green + ", " + blue + ", " + alpha + ")";
+			output.rgba.innerHTML = "rgba("+ red + ", " + green + ", " + blue + ", " + alpha + ") (alpha from 0 to 255)";
 		}
 
-		body.style.backgroundColor = output.rgba.innerHTML;
-		theme_color.content = output.rgba.innerHTML;
+		body.style.backgroundColor = "rgba("+ red + ", " + green + ", " + blue + ", " + (alpha / 256) + ")";
+		theme_color.content = "rgb(" + red + ", " + green + ", " + blue + ")";
 
 		if (red > 128 || green > 128 || blue > 128 || alpha < 128) {
 			body.classList = "dark-color";
