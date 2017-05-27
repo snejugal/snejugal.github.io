@@ -1,0 +1,152 @@
+* {
+  outline: none;
+}
+
+body {
+  background: #eee;
+  color: #424242;
+  max-width: 768px;
+  margin: auto;
+  font-size: 16px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  padding: 24px;
+}
+
+::selection {
+  background: rgba(0, 0, 0, .1);
+  color: inherit;
+}
+
+header {
+  display: grid;
+  grid-template-rows: repeat(2, auto);
+  grid-template-columns: 1fr;
+  grid-gap: 24px;
+}
+
+.header_profile-picture {
+  grid-row: span 2;
+  height: 128px;
+  width: 128px;
+  border-radius: 64px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, .1);
+  user-select: none;
+}
+
+.header_title {
+  margin: 0 0 auto;
+  font-weight: 400;
+  font-size: 45px;
+}
+
+.header_subtitle {
+  margin: auto 0 0;
+  font-size: 20px;
+}
+
+.projects,
+.contacts {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(1, 100%);
+  grid-gap: 24px;
+}
+
+.projects_title,
+.contacts_title {
+  font-size: 34px;
+  font-weight: 400;
+  margin: 24px 0 0;
+}
+
+.projects_project,
+.contacts_link {
+  background: #fff;
+  border-radius: 2px;
+  padding: 24px;
+  transition: transform .3s, opacity .3s, box-shadow .3s;
+  will-change: transform, opacity, box-shadow;
+  opacity: .8;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .1),
+              0 0 0 1px rgba(224, 224, 224, .5);
+  text-decoration: none;
+  color: #424242;
+}
+
+.projects_project:hover,
+.projects_project:focus,
+.contacts_link:hover,
+.contacts_link:focus {
+  transform: translateY(-4px);
+  opacity: 1;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, .1),
+              0 0 0 1px rgba(224, 224, 224, .5);
+}
+
+.projects_project:active,
+.contacts_link:active {
+  transform: translateY(2px);
+  opacity: .6;
+  box-shadow: 0 0px 0px rgba(0, 0, 0, .1),
+              0 0 0 1px rgba(224, 224, 224, .5);
+}
+
+.projects_project_title,
+.contacts_link_title {
+  font-size: 24px;
+  font-weight: 400;
+  margin: 0 0 24px;
+}
+
+.projects_project_description,
+.contacts_link_address {
+  line-height: 1.45;
+  margin: 0;
+}
+
+.projects_project.not-completed .projects_project_description::after,
+.projects_project.ru .projects_project_description::after {
+  content: "Not completed";
+  display: block;
+  margin: 12px 0 0;
+  font-size: 20px;
+  color: #9E9E9E;
+}
+.projects_project.ru .projects_project_description::after {
+  content: "In Russian";
+}
+
+.projects_project.not-completed.ru .projects_project_description::after {
+  content: "In Russian, not completed";
+}
+
+footer {
+  margin-top: 24px;
+  color: #9E9E9E;
+}
+
+@media (min-width: 768px) {
+  body {
+    padding: 36px;
+  }
+
+  header {
+    grid-template-columns: 128px 1fr;
+  }
+
+  .projects {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .projects_title {
+    grid-column: span 2;
+  }
+
+  .contacts {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .contacts_title {
+    grid-column: span 4;
+  }
+}
