@@ -8,7 +8,23 @@
   </head>
   <body>
     <header>
-      <img class="header_profile-picture" src="profile-picture.jpg">
+      <img class="header_profile-picture" src="/profile-picture.jpg">
+      <script>
+        "use strict";
+
+        const img = document.querySelector("img"),
+              script = document.querySelector("script");
+
+        img.dataset.src = img.src;
+        img.src = "";
+
+        addEventListener("load", () => {
+          img.src = img.dataset.src;
+          delete img.dataset.src;
+        });
+
+        script.remove();
+      </script>
       <h1 class="header_title">SnejUgal</h1>
       <p class="header_subtitle">A webcoder and designer for myself.</p>
     </header>
@@ -57,6 +73,6 @@
     <footer>
       &copy; 2017 SnejUgal
     </footer>
-    <link href="style.css" rel="stylesheet">
+    <link href="/style.css" rel="stylesheet">
   </body>
 </html>
