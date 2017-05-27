@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ru">
+	<head>
+		<title>Math Graphs</title>
+		<meta charset="utf-8">
+		<meta name="theme-color" content="#eee">
+		<meta name="viewport" content="width = device-width">
+		<style>
+			body {
+				filter: opacity(0);
+				overflow: hidden;
+			}
+		</style>
+	</head>
+	<body>
+		<section class="graphs">
+			<svg viewbox="0 0 0 0">
+				<path class="background"></path>
+				<circle class="red" r="4"></circle>
+			</svg>
+			<footer>
+				<ul>
+				</ul>
+				<div class="group">
+					<span class="coord"></span>
+					<span class="coord"></span>
+				</div>
+				<div class="group">
+					<span class="zoom">Масштаб: 100%</span>
+					<img src="zoom_in.svg" title="Увеличить">
+					<img src="zoom_out.svg" title="Уменьшить">
+				</div>
+				<ul class="select">
+					<li>Перемещать</li>
+				</ul>
+			</footer>
+		</section>
+		<section class="functions">
+			<h1>Math Graphs</h1>
+			<footer>
+				<div class="group">
+					<img src="add.svg" title="Создать новую функцию">
+				</div>
+				<div class="group">
+					<img src="print.svg" title="Распечатать">
+					<img src="glossary.svg" title="Справочник">
+					<img src="settings.svg" title="Настройки">
+				</div>
+			</footer>
+		</section>
+		<div class="popup-coords">
+			<span class="t-coord"></span>
+			<span class="t-coord"></span>
+		</div>
+		<section class="settings">
+			<div class="close" title="Закрыть">
+				<img src="close.svg">
+			</div>
+			<div class="panel">
+				<h1>Настройки</h1>
+				<input type="checkbox" id="shadows" checked>
+				<label for="shadows">Тени</label>
+				<input type="checkbox" id="animations" checked>
+				<label for="animations">Анимации</label>
+				<input type="checkbox" id="left_panels">
+				<label for="left_panels">Панели слева</label>
+				<label for="accuracy">Точность</label>
+				<input type="number" min="0" step="0.1" value="10" id="accuracy"> % от масштаба
+				<p>
+					Чем выше точность, тем правильнее построение графика, но выше время и производительность, необходимые для построения графика.
+				</p>
+			</div>
+		</section>
+		<section class="glossary">
+			<div class="close" title="Закрыть">
+				<img src="close.svg">
+			</div>
+			<div class="panel">
+				<h1>Справочник</h1>
+				<h2>Константы</h2>
+				<dl>
+					<dt>e <i>≈ 2,7182818284</i></dt>
+					<dd>Число Эйлера или Непера</dd>
+
+					<dt>ln2 <i>≈ 0,6931471805</i></dt>
+					<dd>Натуральный логарифм из 2</dd>
+
+					<dt>ln10 <i>≈ 2,3025850929</i></dt>
+					<dd>Натуральный логарифм из 10</dd>
+
+					<dt>log2e <i>≈ 1,4426950408</i></dt>
+					<dd>Двоичный логарифм из E</dd>
+
+					<dt>log10e <i>≈ 0,4342944819</i></dt>
+					<dd>Десятичный логарифм из E</dd>
+
+					<dt>pi <i>≈ 3,1415926535</i></dt>
+					<dd>Число π</dd>
+
+					<dt>sqrt1_2 <i>≈ 0,7071067811</i></dt>
+					<dd>Квадратный корень из ½</dd>
+
+					<dt>sqrt2 <i>≈ 1,4142135623</i></dt>
+					<dd>Квадратный корень из 2</dd>
+				</dl>
+				<h2>Функции</h2>
+				<dl>
+					<dt title="Нажмите, чтобы создать новую функцию с этой функцией">abs(<i>аргумент</i>)</dt>
+					<dd>Модуль</dd>
+
+					<dt title="Нажмите, чтобы создать новую функцию с этой функцией">acos(<i>аргумент</i>)</dt>
+					<dd>Арккосинус</dd>
+
+					<dt title="Нажмите, чтобы создать новую функцию с этой функцией">acosh(<i>аргумент</i>)</dt>
+					<dd>Гиперболический арккосинус</dd>
+
+					<dt title="Нажмите, чтобы создать новую функцию с этой функцией">asin(<i>аргумент</i>)</dt>
+					<dd>Арксинус</dd>
+
+					<dt title="Нажмите, чтобы создать новую функцию с этой функцией">asinh(<i>аргумент</i>)</dt>
+					<dd>Гиперболический арксинус</dd>
+
+					<dt title="Нажмите, чтобы создать новую функцию с этой функцией">atan(<i>аргумент</i>)</dt>
+					<dd>Арктангенс</dd>
+
+					<dt title="Нажмите, чтобы создать новую функцию с этой функцией">atan2(<i>первый аргумент</i>, <i>второй аргумент</i>)</dt>
+					<dd>Арктангенс от частных аргументов</dd>
+
+					<dt title="Нажмите, чтобы создать новую функцию с этой функцией">cbrt(<i>аргумент</i>)</dt>
+					<dd>Кубический корень</dd>
+
+					<dt title="Нажмите, чтобы создать новую функцию с этой функцией">ceil(<i>аргумент</i>)</dt>
+					<dd>Округление вверх</dd>
+
+					<dt title="Нажмите, чтобы создать новую функцию с этой функцией">clz32(<i>аргумент</i>)</dt>
+					<dd>Количество ведущих нулей 32-битного целого числа</dd>
+
+					<dt title="Нажмите, чтобы создать новую функцию с этой функцией">cos(<i>аргумент</i>)</dt>
+					<dd>Косинус</dd>
+
+					<dt title="Нажмите, чтобы создать новую функцию с этой функцией">cosh(<i>аргумент</i>)</dt>
+					<dd>Гиперболический косинус</dd>
+
+					<dt title="Нажмите, чтобы создать новую функцию с этой функцией">exp(<i>аргумент</i>)</dt>
+					<dd><i>E<sup>x</sup></i>, где <i>x</i> — передаваемый аргумент, <i>E</i> — число Эйлера</dd>
+
+					<dt title="Нажмите, чтобы создать новую функцию с этой функцией">expm1(<i>аргумент</i>)</dt>
+					<dd>exp(<i>аргумент</i>), уменьшенный на единицу</dd>
+
+					<dt title="Нажмите, чтобы создать новую функцию с этой функцией">floor(<i>аргумент</i>)</dt>
+					<dd>Округление вниз</dd>
+
+					<dt title="Нажмите, чтобы создать новую функцию с этой функцией">fround(<i>аргумент</i>)</dt>
+					<dd>Ближайшее число с плавающей запятой одинарной точности</dd>
+
+					<dt title="Нажмите, чтобы создать новую функцию с этой функцией">hypot(<i>любое число аргументов через запятую</i>)</dt>
+					<dd>Квадратный корень из суммы квадратов аргументов</dd>
+
+					<dt title="Нажмите, чтобы создать новую функцию с этой функцией">imul(<i>первый аргумент</i>, <i>второй аргумент</i>)</dt>
+					<dd>Умножение 32-битных целых чисел</dd>
+
+					<dt title="Нажмите, чтобы создать новую функцию с этой функцией">log(<i>аргумент</i>)</dt>
+					<dd>Натуральный логарифт</dd>
+
+					<dt title="Нажмите, чтобы создать новую функцию с этой функцией">log1p(<i>аргумент</i>)</dt>
+					<dd>log(1 + <i>аргумент</i>)</dd>
+
+					<dt title="Нажмите, чтобы создать новую функцию с этой функцией">log10(<i>аргумент</i>)</dt>
+					<dd>Десятичный логарифм</dd>
+
+					<dt title="Нажмите, чтобы создать новую функцию с этой функцией">log2(<i>аргумент</i>)</dt>
+					<dd>Двоичный логарифм</dd>
+
+					<dt title="Нажмите, чтобы создать новую функцию с этой функцией">max(<i>любое число аргументов через запятую</i>)</dt>
+					<dd>Наибольшое из аргументов</dd>
+
+					<dt title="Нажмите, чтобы создать новую функцию с этой функцией">min(<i>любое число аргументов через запятую</i>)</dt>
+					<dd>Наименьшее из аргументов</dd>
+
+					<dt title="Нажмите, чтобы создать новую функцию с этой функцией">pow(<i>основание</i>, <i>показатель</i>)</dt>
+					<dd>Возведение в степень</dd>
+
+					<dt title="Нажмите, чтобы создать новую функцию с этой функцией">round(<i>аргумент</i>)</dt>
+					<dd>Округление числа</dd>
+
+					<dt title="Нажмите, чтобы создать новую функцию с этой функцией">sign(<i>аргумент</i>)</dt>
+					<dd>Знак числа</dd>
+
+					<dt title="Нажмите, чтобы создать новую функцию с этой функцией">sin(<i>аргумент</i>)</dt>
+					<dd>Синус</dd>
+
+					<dt title="Нажмите, чтобы создать новую функцию с этой функцией">sinh(<i>аргумент</i>)</dt>
+					<dd>Гиперболический синус</dd>
+
+					<dt title="Нажмите, чтобы создать новую функцию с этой функцией">sqrt(<i>аргумент</i>)</dt>
+					<dd>Квадратный корень</dd>
+
+					<dt title="Нажмите, чтобы создать новую функцию с этой функцией">tan(<i>аргумент</i>)</dt>
+					<dd>Тангенс</dd>
+
+					<dt title="Нажмите, чтобы создать новую функцию с этой функцией">tanh(<i>аргумент</i>)</dt>
+					<dd>Гиперболический тангенс</dd>
+
+					<dt title="Нажмите, чтобы создать новую функцию с этой функцией">trunc(<i>аргумент</i>)</dt>
+					<dd>Целая часть числа</dd>
+				</dl>
+			</div>
+		</section>
+		<script>
+			if (screen.width < screen.height) {
+				document.body.classList.add("portrait");
+			} else {
+				document.body.classList.remove("portrait");
+			}
+		</script>
+		<script src="script.js?8" async></script>
+		<link href="style.css?2" rel="stylesheet">
+		<!-- <script src="//cdn.jsdelivr.net/eruda/1.0.5/eruda.min.js"></script>
+		<script>eruda.init();</script> -->
+	</body>
+	<!--
+		Сделано SnejUgal
+		Made by Snejugal
+			vk.com/snejugal
+			twitter.com/snejugal
+	-->
+</html>
