@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>.attheme editor</title>
+    <meta charset="utf-8">
+    <meta name="theme-color" content="#eee">
+    <meta name="viewport" content="width=device-width">
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <h1>.attheme editor</h1>
+      </div>
+    </header>
+    <section>
+      <noscript>
+        Seems you've turned JS off. Could you please turn it on?
+      </noscript>
+      <script>
+        document.querySelector("section").className = "loading";
+      </script>
+    </section>
+    <div class="drag">
+      Drop a file here
+    </div>
+    <link href="style.css" rel="stylesheet">
+    <script src="default_values.js" defer></script>
+    <script src="script.js" defer></script>
+    <link href="transparency.svg" rel="preload">
+  </body>
+</html>
