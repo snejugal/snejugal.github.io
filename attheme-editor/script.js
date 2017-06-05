@@ -437,8 +437,8 @@ const create_element = (name, options) => {
 
           dialog.appendChild(code_input);
           ok.addEventListener("click", () => {
-            dialog.container.click();
             load_theme(dialog.code_input.value);
+            dialog.container.click();
             localStorage.theme_name = "Awesome theme";
             set_workplace("workplace");
           });
