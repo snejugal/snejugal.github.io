@@ -9,7 +9,7 @@ let workplace = document.querySelector("section"),
     suggestions,
     i, k, j;
 
-const create_element = (name, options) => {
+const create_element = function(name, options) {
         let element = document.createElement(name);
         for (i in options) {
           if (i != "data" && i != "_listeners") {
@@ -26,7 +26,7 @@ const create_element = (name, options) => {
         }
         return element;
       },
-      set_workplace = (to) => {
+      set_workplace = function(to) {
         switch(to) {
           case "welcome":
             workplace.className = "welcome";
@@ -41,7 +41,7 @@ const create_element = (name, options) => {
                   type: "button",
                   className: "welcome_button",
                   _listeners: {
-                    click: () => {
+                    click: function() {
                       theme = {};
                       save_theme();
                       localStorage.theme_name = "Awesome theme";
@@ -54,7 +54,7 @@ const create_element = (name, options) => {
                   type: "button",
                   className: "welcome_button",
                   _listeners: {
-                    click: () => {
+                    click: function() {
                       document.querySelector("input").click();
                     }
                   }
@@ -774,8 +774,12 @@ if (location.href.slice(-2) == "/#") {
   history.replaceState(null, document.title, location.href.slice(0, -2));
 }
 
-addEventListener("dragstart", drag_start);
+// addEventListener("dragstart", drag_start);
 // addEventListener("dragenter", drag_enter);
-addEventListener("dragleave", drag_leave);
-document.querySelector(".drag").addEventListener("dragend", drop);
-document.querySelector(".drag").addEventListener("drop", drop);
+// addEventListener("dragleave", drag_leave);
+// document.querySelector(".drag").addEventListener("dragend", drop);
+// document.querySelector(".drag").addEventListener("drop", drop);
+
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/service-worker.js");
+}

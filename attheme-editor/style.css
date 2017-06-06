@@ -44,7 +44,7 @@ body {
 
 header {
   width: 100%;
-  color: var(--theme-color);
+  color: #2196f3;
   box-shadow: 0 2px 4px rgba(0, 0, 0, .1);
   height: 60px;
   z-index: 3;
@@ -91,7 +91,7 @@ noscript {
 .loading::before {
   width: 56px;
   height: 56px;
-  border: 5px solid var(--theme-color);
+  border: 5px solid #2196f3;
   border-top-color: transparent;
   display: block;
   border-radius: 28px;
@@ -124,7 +124,7 @@ noscript {
   display: block;
   padding: 8px 18px 12px;
   font-family: inherit;
-  background-color: var(--theme-color);
+  background-color: #2196f3;
   color: #fff;
   position: relative;
   transition: transform .3s, opacity .3s, box-shadow .3s;
@@ -176,7 +176,7 @@ noscript {
 }
 
 .workplace_theme-name:focus {
-  border-bottom-color: var(--theme-color);
+  border-bottom-color: #2196f3;
 }
 
 .workplace_buttons_button {
@@ -196,7 +196,7 @@ noscript {
 .workplace_warning {
   padding: 12px;
   color: #fff;
-  background: var(--theme-color);
+  background: #2196f3;
   border-radius: 2px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, .1);
   margin-bottom: 24px;
@@ -452,7 +452,7 @@ noscript {
 .window_buttons_button {
   margin-left: 24px;
   border: none;
-  color: var(--theme-color);
+  color: #2196f3;
   padding: 0 8px;
   height: 36px;
   line-height: 36px;
@@ -511,7 +511,7 @@ noscript {
 }
 
 .window_input:focus {
-  border-bottom-color: var(--theme-color);
+  border-bottom-color: #2196f3;
 }
 
 .window_input.error {
