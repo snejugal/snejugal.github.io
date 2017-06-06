@@ -781,5 +781,5 @@ if (location.href.slice(-2) == "/#") {
 // document.querySelector(".drag").addEventListener("drop", drop);
 
 if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("/service-worker.js");
+  navigator.serviceWorker.register("service-worker.js");
 }
