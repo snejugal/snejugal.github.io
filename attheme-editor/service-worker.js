@@ -7,7 +7,7 @@ self.addEventListener("install", function(event) {
       "style.css",
       "transparency.svg",
       "favicon.png",
-      "/"
+      "/attheme-editor/"
     ]).then(function() {
       self.skipWaiting();
     })
