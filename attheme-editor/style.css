@@ -181,6 +181,20 @@ noscript {
   background: #F44336;
 }
 
+.workplace_buttons_button.download-button {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 28px;
+  margin: 0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, .2);
+  background-image: url("download.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
 .workplace_buttons {
   display: flex;
   flex-wrap: wrap;
@@ -242,6 +256,7 @@ noscript {
   position: sticky;
   z-index: 2;
   top: 0px;
+  margin: 0 -24px;
 }
 
 .workplace_add-variable_input {
@@ -281,7 +296,6 @@ noscript {
   display: none;
   position: absolute;
   width: 100%;
-  border-radius: 0 0 2px 2px;
   box-shadow: 0 8px 8px rgba(0, 0, 0, .2);
   max-height: 256px;
   overflow: auto;
@@ -343,7 +357,7 @@ noscript {
 
 .workplace_variables {
   list-style: none;
-  margin: 0 0 48px;
+  margin: 0 -24px 80px;
   padding: 0;
   display: flex;
   flex-wrap: wrap;
@@ -603,7 +617,19 @@ noscript {
 }
 
 @media (min-width: 768px) {
+  .workplace_variables {
+    margin: 0 0 80px;
+  }
+
   .workplace_variables_variable {
     width: 50%;
+  }
+
+  .workplace_add-variable-container {
+    margin: 0;
+  }
+
+  .workplace_add-variable_suggestions {
+    border-radius: 0 0 2px 2px;
   }
 }

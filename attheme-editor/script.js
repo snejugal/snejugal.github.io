@@ -123,9 +123,8 @@ const create_element = function(name, options) {
                   className: "workplace_buttons"
                 }),
                 download_button = create_element("button", {
-                  className: "workplace_buttons_button",
+                  className: "workplace_buttons_button download-button",
                   type: "button",
-                  innerHTML: "Download",
                   _listeners: {
                     click: function() {
                       let file_content = "";
@@ -315,8 +314,6 @@ const create_element = function(name, options) {
                   workplace.appendChild(image_removing_warning);
                   elements.warning = image_removing_warning;
             }
-
-            buttons.appendChild(download_button);
             buttons.appendChild(close_button);
             add_varaible_container.appendChild(add_varaible_input);
             add_varaible_container.appendChild(add_varaible_suggestions);
@@ -324,6 +321,7 @@ const create_element = function(name, options) {
             workplace.appendChild(buttons);
             workplace.appendChild(add_varaible_container);
             workplace.appendChild(variable_list);
+            workplace.appendChild(download_button);
 
             addEventListener("keydown", function(event) {
               if (event.ctrlKey && !event.shiftKey && event.code == "KeyF") {
