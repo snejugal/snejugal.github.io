@@ -37,6 +37,9 @@ const create_element = function(name, options) {
                   innerHTML: "Start working on your theme",
                   className: "welcome_title"
                 }),
+                buttons_container = create_element("div", {
+                  className: "welcome_buttons"
+                }),
                 new_theme = create_element("button", {
                   innerHTML: "Create a new theme",
                   type: "button",
@@ -94,9 +97,10 @@ const create_element = function(name, options) {
                 });
 
             workplace.appendChild(title);
-            workplace.appendChild(new_theme);
-            workplace.appendChild(open_theme);
-            workplace.appendChild(copy_theme_code);
+            buttons_container.appendChild(new_theme);
+            buttons_container.appendChild(open_theme);
+            buttons_container.appendChild(copy_theme_code);
+            workplace.appendChild(buttons_container);
             // workplace.appendChild(moving_hint),
             workplace.appendChild(file_input);
             break;
