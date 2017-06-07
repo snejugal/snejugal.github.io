@@ -1,12 +1,13 @@
 "use strict";
 
 let workplace = document.querySelector("section"),
-    theme = localStorage.theme ? JSON.parse(localStorage.theme) : {},
+    theme = (localStorage.theme) ? JSON.parse(localStorage.theme) : {},
     elements,
     image = false,
     editing = null,
     drag_from_page = false,
     suggestions,
+    dialog,
     i, k, j;
 
 const create_element = function(name, options) {
@@ -64,7 +65,7 @@ const create_element = function(name, options) {
                   type: "button",
                   className: "welcome_button",
                   _listeners: {
-                    click: () => {
+                    click: function() {
                       show_dialog("code_putting");
                     }
                   }
@@ -79,7 +80,7 @@ const create_element = function(name, options) {
                     change: function() {
                       if (this.files[0].name.slice(-8) == ".attheme"){
                         let reader = new FileReader();
-                        reader.onload = () => {
+                        reader.onload = function() {
                           load_theme(reader.result);
                           set_workplace("workplace");
                         };
@@ -98,9 +99,6 @@ const create_element = function(name, options) {
             workplace.appendChild(copy_theme_code);
             // workplace.appendChild(moving_hint),
             workplace.appendChild(file_input);
-            elements = {
-              file_input: file_input
-            };
             break;
           case "workplace":
             workplace.classList = "workplace";
@@ -112,7 +110,7 @@ const create_element = function(name, options) {
                   placeholder: "Theme name",
                   value: localStorage.theme_name,
                   _listeners: {
-                    change: () => {
+                    change: function() {
                       localStorage.theme_name = elements.theme_name.value;
                     }
                   }
@@ -125,7 +123,7 @@ const create_element = function(name, options) {
                   type: "button",
                   innerHTML: "Download",
                   _listeners: {
-                    click: () => {
+                    click: function() {
                       let file_content = "";
 
                       for (i in theme) {
@@ -155,7 +153,7 @@ const create_element = function(name, options) {
                   type: "button",
                   innerHTML: "Close theme",
                   _listeners: {
-                    click: () => {
+                    click: function() {
                       show_dialog("closing_theme");
                     }
                   }
@@ -302,7 +300,7 @@ const create_element = function(name, options) {
 
                   warning_close.setAttribute("class", "workplace_warning_close");
                   warning_close.setAttribute("viewBox", "0 0 24 24");
-                  warning_close.addEventListener("click", () => {
+                  warning_close.addEventListener("click", function() {
                     elements.warning.remove();
                     delete elements.warning;
                   });
@@ -323,10 +321,10 @@ const create_element = function(name, options) {
             workplace.appendChild(add_varaible_container);
             workplace.appendChild(variable_list);
 
-            addEventListener("keydown", (event) => {
+            addEventListener("keydown", function(event) {
               if (event.ctrlKey && !event.shiftKey && event.code == "KeyF") {
                 event.preventDefault();
-                scrollTo(0, document.querySelector(".workplace_add-variable_input").getBoundingClientRect().top + document.body.scrollTop - 60);
+                scrollTo(0, document.querySelector(".workplace_add-variable_input").getBoundingClientRect().top + document.body.scrollTop);
                 document.querySelector(".workplace_add-variable_input").focus();
               }
             });
@@ -340,7 +338,7 @@ const create_element = function(name, options) {
             }
         }
       },
-      load_theme = (text) => {
+      load_theme = function(text) {
         let rows = text.split("\n");
         for (let i = 0; i < rows.length; i++) {
           if (rows[i] != "" && rows[i].indexOf("=") + 1 && rows[i].slice(0, 2) != "//") {
@@ -371,16 +369,16 @@ const create_element = function(name, options) {
         }
         save_theme();
       },
-      save_theme = () => {
+      save_theme = function() {
         localStorage.theme = JSON.stringify(theme);
       },
-      show_dialog = (type) => {
+      show_dialog = function(type) {
         let container = create_element("div", {
               className: "window-container",
               _listeners: {
-                click: () => {
+                click: function() {
                   dialog.container.className = "window-container disappear";
-                  dialog.container.addEventListener("animationend", () => {
+                  dialog.container.addEventListener("animationend", function() {
                     if (dialog.container) {
                       dialog.container.remove();
                     }
@@ -390,14 +388,6 @@ const create_element = function(name, options) {
                   history.onpushstate = null;
                   onpopstate = null;
                   history.back();
-                }
-              }
-            }),
-            dialog = create_element("div", {
-              className: "window",
-              _listeners: {
-                click: (event) => {
-                  event.stopPropagation();
                 }
               }
             }),
@@ -414,7 +404,7 @@ const create_element = function(name, options) {
               innerHTML: "Cancel",
               className: "window_buttons_button",
               _listeners: {
-                click: () => {
+                click: function() {
                   dialog.container.click();
                 }
               }
@@ -422,6 +412,15 @@ const create_element = function(name, options) {
             buttons_container = create_element("div", {
               className: "window_buttons"
             });
+
+        dialog = create_element("div", {
+          className: "window",
+          _listeners: {
+            click: function(event) {
+              event.stopPropagation();
+            }
+          }
+        });
 
         dialog.container = container;
         container.appendChild(dialog);
@@ -436,7 +435,7 @@ const create_element = function(name, options) {
           });
 
           dialog.appendChild(code_input);
-          ok.addEventListener("click", () => {
+          ok.addEventListener("click", function() {
             load_theme(elements.code_input.value);
             dialog.container.click();
             localStorage.theme_name = "Awesome theme";
@@ -445,7 +444,7 @@ const create_element = function(name, options) {
           elements.code_input = code_input;
         } else if (type == "closing_theme") {
           title.innerHTML = "Are you sure you want to stop working on the theme and close it?";
-          ok.addEventListener("click", () => {
+          ok.addEventListener("click", function() {
             dialog.container.click();
             theme = {};
             image = false;
@@ -494,10 +493,10 @@ const create_element = function(name, options) {
                             dialog.blue.value = parseInt(this.value.slice(5, 7), 16);
                           }
                         }
+                        dialog.color.style.background = "rgba(" + dialog.red.value + "," + dialog.green.value + "," + dialog.blue.value + "," + (dialog.alpha.value / 255) + ")";
                       } else {
                         dialog.ok.click();
                       }
-                      dialog.color.style.background = "rgba(" + dialog.red.value + "," + dialog.green.value + "," + dialog.blue.value + "," + (dialog.alpha.value / 255) + ")"
                     }, 1)
                   }
                 }
@@ -540,7 +539,7 @@ const create_element = function(name, options) {
                 value: (theme[editing].red !== undefined) ? theme[editing].red : Math.floor(Math.random() * 256),
                 _listeners: {
                   keydown: function(event) {
-                    setTimeout(() => {
+                    setTimeout(function() {
                       if (this.value > 255) {
                         this.value = 255;
                       } else if (this.value < 0) {
@@ -550,7 +549,7 @@ const create_element = function(name, options) {
                     }, 1);
                   },
                   change: function(event) {
-                    setTimeout(() => {
+                    setTimeout(function() {
                       if (this.value > 255) {
                         this.value = 255;
                       } else if (this.value < 0) {
@@ -571,7 +570,7 @@ const create_element = function(name, options) {
                 value: (theme[editing].green !== undefined) ? theme[editing].green : Math.floor(Math.random() * 256),
                 _listeners: {
                   keydown: function(event) {
-                    setTimeout(() => {
+                    setTimeout(function() {
                       if (this.value > 255) {
                         this.value = 255;
                       } else if (this.value < 0) {
@@ -581,7 +580,7 @@ const create_element = function(name, options) {
                     }, 1);
                   },
                   change: function(event) {
-                    setTimeout(() => {
+                    setTimeout(function() {
                       if (this.value > 255) {
                         this.value = 255;
                       } else if (this.value < 0) {
@@ -602,7 +601,7 @@ const create_element = function(name, options) {
                 value: (theme[editing].blue !== undefined) ? theme[editing].blue : Math.floor(Math.random() * 256),
                 _listeners: {
                   keydown: function(event) {
-                    setTimeout(() => {
+                    setTimeout(function() {
                       if (this.value > 255) {
                         this.value = 255;
                       } else if (this.value < 0) {
@@ -612,7 +611,7 @@ const create_element = function(name, options) {
                     }, 1);
                   },
                   change: function(event) {
-                    setTimeout(() => {
+                    setTimeout(function() {
                       if (this.value > 255) {
                         this.value = 255;
                       } else if (this.value < 0) {
@@ -633,7 +632,7 @@ const create_element = function(name, options) {
                 value: (theme[editing].alpha !== undefined) ? theme[editing].alpha : Math.floor(Math.random() * 256),
                 _listeners: {
                   keydown: function(event) {
-                    setTimeout(() => {
+                    setTimeout(function() {
                       if (this.value > 255) {
                         this.value = 255;
                       } else if (this.value < 0) {
@@ -643,7 +642,7 @@ const create_element = function(name, options) {
                     }, 1);
                   },
                   change: function(event) {
-                    setTimeout(() => {
+                    setTimeout(function() {
                       if (this.value > 255) {
                         this.value = 255;
                       } else if (this.value < 0) {
@@ -668,7 +667,7 @@ const create_element = function(name, options) {
           dialog.blue = blue;
           dialog.alpha = alpha;
           dialog.hex = hex_input;
-          ok.addEventListener("click", () => {
+          ok.addEventListener("click", function() {
             theme[editing] = {
               alpha: +dialog.alpha.value,
               red: +dialog.red.value,
@@ -697,7 +696,7 @@ const create_element = function(name, options) {
         } else if (type == "incorrect-file") {
           title.innerHTML = "You selected a file with an incorrect extension (it should be .attheme)";
           ok.innerHTML = "Got it";
-          ok.addEventListener("click", () => {
+          ok.addEventListener("click", function() {
             dialog.container.click();
           });
         }
@@ -713,10 +712,10 @@ const create_element = function(name, options) {
         history.onpushstate = close_dialog;
         onpopstate = close_dialog;
       },
-      close_dialog = (event) => {
+      close_dialog = function(event) {
         event.preventDefault();
         dialog.container.className = "window-container disappear";
-        dialog.container.addEventListener("animationend", () => {
+        dialog.container.addEventListener("animationend", function() {
           dialog.container.remove();
           delete dialog.container;
           delete dialog.code_input;
@@ -724,18 +723,18 @@ const create_element = function(name, options) {
         history.onpushstate = null;
         onpopstate = null;
       },
-      b16 = (number) => {
+      b16 = function(number) {
         number = number.toString(16);
         return new Array(3 - number.length).join("0") + number;
       },
-      change_value = (dialog) => {
+      change_value = function() {
         dialog.hex.value = "#" + b16(+dialog.alpha.value) + b16(+dialog.red.value) + b16(+dialog.green.value) + b16(+dialog.blue.value);
         dialog.color.style.background = "rgba(" + dialog.red.value + "," + dialog.green.value + "," + dialog.blue.value + "," + (dialog.alpha.value / 255) + ")";
       },
-      drag_start = () => {
+      drag_start = function() {
         drag_from_page = true;
       },
-      drag_enter = (event) => {
+      drag_enter = function(event) {
         if (!drag_from_page && workplace.className == "welcome") {
           document.querySelector(".drag").className = "drag active";
           console.log(event.target);
@@ -743,16 +742,16 @@ const create_element = function(name, options) {
           event.target.addEventListener("drop", drop);
         }
       },
-      drag_leave = () => {
+      drag_leave = function() {
         document.querySelector(".drag").className = "drag"
       },
-      drop = (event) => {
+      drop = function(event) {
         event.preventDefault();
         console.log("Got the file!");
         if (!drag_from_page && workplace.className == "welcome") {
           if (event.dataTransfer.files[0].name.slice(-8) == ".attheme"){
             let reader = new FileReader();
-            reader.onload = () => {
+            reader.onload = function() {
               load_theme(reader.result);
               set_workplace("workplace");
             };

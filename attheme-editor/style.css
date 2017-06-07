@@ -15,7 +15,6 @@ body {
   font-size: 16px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --theme-color: #2196f3;
-  padding-top: 60px;
 }
 
 .drag {
@@ -48,10 +47,7 @@ header {
   box-shadow: 0 2px 4px rgba(0, 0, 0, .1);
   height: 60px;
   z-index: 3;
-  background: rgba(255, 255, 255, .95);
-  position: fixed;
-  top: 0;
-  left: 0;
+  background: #fff;
 }
 
 .container {
@@ -69,7 +65,7 @@ header h1 {
 }
 
 section {
-  height: calc(100vh - 60px);
+  min-height: calc(100vh - 60px);
   padding: 24px;
   max-width: 1024px;
   margin: auto;
@@ -183,6 +179,7 @@ noscript {
   font-size: 16px;
   margin-right: 24px;
 }
+
 .workplace_buttons_button.red {
   background: #F44336;
 }
@@ -245,7 +242,9 @@ noscript {
 
 .workplace_add-variable-container {
   position: relative;
+  position: sticky;
   z-index: 2;
+  top: 0px;
 }
 
 .workplace_add-variable_input {
@@ -256,7 +255,6 @@ noscript {
   font-family: inherit;
   caret-color: #424242;
   color: #424242;
-  border-radius: 2px 2px 0 0;
   box-shadow: 0 4px 6px rgba(0, 0, 0, .1);
   z-index: 2;
   will-change: box-shadow;
