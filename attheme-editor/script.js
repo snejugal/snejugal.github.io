@@ -8,6 +8,7 @@ let workplace = document.querySelector("section"),
     drag_from_page = false,
     suggestions,
     dialog,
+    theme_palette = (localStorage.palette) ? JSON.parse(localStorage.palette) : [],
     i, k, j;
 
 const create_element = function(name, options) {
@@ -370,9 +371,12 @@ const create_element = function(name, options) {
           }
         }
         save_theme();
+        generate_theme_palette();
       },
       save_theme = function() {
         localStorage.theme = JSON.stringify(theme);
+        generate_theme_palette();
+        localStorage.palette = JSON.stringify(theme_palette);
       },
       show_dialog = function(type) {
         let container = create_element("div", {
@@ -465,41 +469,16 @@ const create_element = function(name, options) {
                   keydown: function(event) {
                     setTimeout(() => {
                       if (event.key != "Enter") {
-                        if (this.value.slice(0, 1) != "#" && this.value.length != 0) {
-                          this.value = "#" + this.value;
-                        }
-
-                        for (i = 1; i < this.value.length; i++) {
-                          if (parseInt(this.value[i], 16) != parseInt(this.value[i], 16)) {
-                            this.value = this.value.slice(0, i);
-                          }
-                        }
-
-                        if (this.value.length == 9) {
-                          dialog.alpha.value = parseInt(this.value.slice(1, 3), 16);
-                          dialog.red.value = parseInt(this.value.slice(3, 5), 16);
-                          dialog.green.value = parseInt(this.value.slice(5, 7), 16);
-                          dialog.blue.value = parseInt(this.value.slice(7, 9), 16);
-                        } else {
-                          dialog.alpha.value = 255;
-                          dialog.red.value = 0;
-                          dialog.green.value = 0;
-                          dialog.blue.value = 0;
-                          if (this.value.length > 2) {
-                            dialog.red.value = parseInt(this.value.slice(1, 3), 16);
-                          }
-                          if (this.value.length > 4) {
-                            dialog.green.value = parseInt(this.value.slice(3, 5), 16);
-                          }
-                          if (this.value.length > 6) {
-                            dialog.blue.value = parseInt(this.value.slice(5, 7), 16);
-                          }
-                        }
-                        dialog.color.style.background = "rgba(" + dialog.red.value + "," + dialog.green.value + "," + dialog.blue.value + "," + (dialog.alpha.value / 255) + ")";
+                        change_rgba_values(this);
                       } else {
                         dialog.ok.click();
                       }
                     }, 1)
+                  },
+                  paste: function() {
+                    setTimeout(function() {
+                      change_rgba_values(hex_input);
+                    }, 4);
                   }
                 }
               }),
@@ -659,7 +638,29 @@ const create_element = function(name, options) {
                 className: "window_color-container"
               }),
               color = create_element("div", {
-                className: "window_color"
+                className: "window_color",
+                _listeners: {
+                  click: function() {
+                    dialog.color_input.click();
+                  }
+                }
+              }),
+              color_input = create_element("input", {
+                type: "color",
+                value: "#" + b16(theme[editing].red) + b16(theme[editing].green) + b16(theme[editing].blue),
+                _listeners: {
+                  change: function() {
+                    dialog.color.style.background = this.value;
+                    hex_input.value = "#ff" + this.value.slice(1);
+                    red.value = parseInt(this.value.slice(1, 3), 16);
+                    green.value = parseInt(this.value.slice(3, 5), 16);
+                    blue.value = parseInt(this.value.slice(5, 7), 16);
+                    alpha.value = 255;
+                  }
+                }
+              }),
+              palette_container = create_element("div", {
+                className: "window_palette"
               });
 
           color.style.background = "rgba(" + theme[editing].red + "," + theme[editing].green + "," + theme[editing].blue + "," + (theme[editing].alpha / 255) + ")";
@@ -681,20 +682,48 @@ const create_element = function(name, options) {
             save_theme();
             dialog.container.click();
           });
+
+          let palette_colors = [];
+          for (k = 0; k < theme_palette.length; k++) {
+            let n = palette_colors.push(create_element("div", {
+                  className: "window_palette_color",
+                  data: {
+                    color: theme_palette[k]
+                  },
+                  _listeners: {
+                    click: function() {
+                      red.value = parseInt(this.dataset.color.slice(1, 3), 16);
+                      green.value = parseInt(this.dataset.color.slice(3, 5), 16);
+                      blue.value = parseInt(this.dataset.color.slice(5, 7), 16);
+                      alpha.value = 255;
+                      change_value();
+                    }
+                  }
+                }));
+            palette_colors[n - 1].style.background = palette_colors[n - 1].dataset.color;
+            palette_container.appendChild(palette_colors[n - 1]);
+          }
+
           dialog.appendChild(color_container);
+          dialog.appendChild(color_input);
           dialog.appendChild(hex_input_label);
           dialog.appendChild(hex_input);
           dialog.appendChild(rgba);
+          dialog.appendChild(palette_container);
+
           color_container.appendChild(color);
           rgba.appendChild(red_label);
           rgba.appendChild(green_label);
           rgba.appendChild(blue_label);
           rgba.appendChild(alpha_label);
+
           red_label.appendChild(red);
           green_label.appendChild(green);
           blue_label.appendChild(blue);
           alpha_label.appendChild(alpha);
+
           dialog.color = color;
+          dialog.color_input = color_input;
         } else if (type == "incorrect-file") {
           title.innerHTML = "You selected a file with an incorrect extension (it should be .attheme)";
           ok.innerHTML = "Got it";
@@ -763,6 +792,58 @@ const create_element = function(name, options) {
             show_dialog("incorrect-file");
           }
         }
+      },
+      generate_theme_palette = function() {
+        theme_palette = [];
+        for (i in theme) {
+          if (theme[i].alpha != 0) {
+            let color = "#" + b16(theme[i].red) + b16(theme[i].green) + b16(theme[i].blue),
+                already_in_palette = false;
+            for (k = 0; k < theme_palette.length; k++) {
+              if (theme_palette[k] == color) {
+                already_in_palette = true;
+                break;
+              }
+            }
+
+            if (!already_in_palette) {
+              theme_palette.push(color);
+            }
+          }
+        }
+      },
+      change_rgba_values = function(hex_input) {
+        if (hex_input.value.slice(0, 1) != "#" && hex_input.value.length != 0) {
+          hex_input.value = "#" + hex_input.value;
+        }
+
+        for (i = 1; i < hex_input.value.length; i++) {
+          if (parseInt(hex_input.value[i], 16) != parseInt(hex_input.value[i], 16)) {
+            hex_input.value = hex_input.value.slice(0, i);
+          }
+        }
+
+        if (hex_input.value.length == 9) {
+          dialog.alpha.value = parseInt(hex_input.value.slice(1, 3), 16);
+          dialog.red.value = parseInt(hex_input.value.slice(3, 5), 16);
+          dialog.green.value = parseInt(hex_input.value.slice(5, 7), 16);
+          dialog.blue.value = parseInt(hex_input.value.slice(7, 9), 16);
+        } else {
+          dialog.alpha.value = 255;
+          dialog.red.value = 0;
+          dialog.green.value = 0;
+          dialog.blue.value = 0;
+          if (hex_input.value.length > 2) {
+            dialog.red.value = parseInt(hex_input.value.slice(1, 3), 16);
+          }
+          if (hex_input.value.length > 4) {
+            dialog.green.value = parseInt(hex_input.value.slice(3, 5), 16);
+          }
+          if (hex_input.value.length > 6) {
+            dialog.blue.value = parseInt(hex_input.value.slice(5, 7), 16);
+          }
+        }
+        dialog.color.style.background = "rgba(" + dialog.red.value + "," + dialog.green.value + "," + dialog.blue.value + "," + (dialog.alpha.value / 255) + ")";
       };
 
 if (!localStorage.theme) {
