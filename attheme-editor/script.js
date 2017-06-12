@@ -9,6 +9,7 @@ let workplace = document.querySelector("section"),
     suggestions,
     dialog,
     theme_palette = (localStorage.palette) ? JSON.parse(localStorage.palette) : [],
+    variables_amount,
     i, k, j;
 
 const create_element = function(name, options) {
@@ -131,19 +132,32 @@ const create_element = function(name, options) {
                       let file_content = "";
 
                       for (i in theme) {
-                        let alpha = b16(theme[i].alpha),
+                        if (defaults[i] &&
+                            (theme[i].alpha != defaults[i].alpha ||
+                            theme[i].red != defaults[i].red ||
+                            theme[i].green != defaults[i].green ||
+                            theme[i].blue != defaults[i].blue)) {
+                          let alpha = b16(theme[i].alpha),
                             red = b16(theme[i].red),
                             blue = b16(theme[i].blue),
-                            green = b16(theme[i].green);
+                            green = b16(theme[i].green),
+                            hex = "" + red + green + blue;
 
-                        file_content += i + "=#" + alpha + red + green + blue + "\n";
+                          if (alpha == "ff") {
+                            file_content += i + "=#" + hex + "\n";
+                          } else if (alpha == "00") {
+                            file_content += i + "=0\n";
+                          } else {
+                            file_content += i + "=#" + alpha + hex + "\n";
+                          }
+                        }
                       }
 
                       if (localStorage.image) {
                         file_content += "WPS\n" + localStorage.image;
                       }
                       let file = create_element("a", {
-                        href: "data:text/plain;charset=utf-8," + encodeURIComponent(file_content),
+                        href: "data:text/plain;charset=ansi," + encodeURIComponent(file_content),
                         download: localStorage.theme_name + ".attheme"
                       });
                       document.body.appendChild(file);
@@ -191,7 +205,7 @@ const create_element = function(name, options) {
                                   _listeners: {
                                     click: function() {
                                       if (!theme[this.innerHTML]) {
-
+                                        variables_amount.innerHTML = parseInt(variables_amount.innerHTML) + 1 + " of " + default_variables.length + " variables are added to your theme";
                                         theme[this.innerHTML] = {
                                           alpha: defaults[this.innerHTML].alpha,
                                           red: defaults[this.innerHTML].red,
@@ -219,7 +233,7 @@ const create_element = function(name, options) {
                                             });
 
                                         variable.style.background = "rgba(" + theme[this.innerHTML].red + "," + theme[this.innerHTML].green + "," + theme[this.innerHTML].blue + "," + alpha + ")";
-                                        if (brightness > 210) {
+                                        if (brightness > 192) {
                                           variable.className += " dark-text";
                                         }
                                         variable.appendChild(variable_name);
@@ -253,8 +267,12 @@ const create_element = function(name, options) {
                 }),
                 variable_list = create_element("ul", {
                   className: "workplace_variables"
-                });
+                }),
+                amount = 0;
 
+            variables_amount = create_element("div", {
+              className: "workplace_variables-amount"
+            });
             elements.variables = {};
             for (k in theme) {
               let alpha = (theme[k].alpha != 0) ? theme[k].alpha / 255 : 0,
@@ -278,7 +296,7 @@ const create_element = function(name, options) {
                   });
 
               variable.style.background = "rgba(" + theme[k].red + "," + theme[k].green + "," + theme[k].blue + "," + alpha + ")";
-              if (brightness > 210) {
+              if (brightness > 192) {
                 variable.className += " dark-text";
               }
               variable.appendChild(variable_name);
@@ -292,7 +310,11 @@ const create_element = function(name, options) {
               variable.dataset.variable = k;
               elements.variables[k] = variable;
               variable_list.appendChild(variable);
+
+              amount++;
             }
+
+            variables_amount.innerHTML = amount + " of " + default_variables.length + " variables are added to your theme";
 
             if (image) {
               let image_removing_warning = create_element("div", {
@@ -302,18 +324,18 @@ const create_element = function(name, options) {
                   warning_close = document.createElementNS("http://www.w3.org/2000/svg", "svg"),
                   warning_close_path = document.createElementNS("http://www.w3.org/2000/svg", "path");
 
-                  warning_close.setAttribute("class", "workplace_warning_close");
-                  warning_close.setAttribute("viewBox", "0 0 24 24");
-                  warning_close.addEventListener("click", function() {
-                    elements.warning.remove();
-                    delete elements.warning;
-                  });
-                  warning_close_path.setAttribute("d", "M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z");
+              warning_close.setAttribute("class", "workplace_warning_close");
+              warning_close.setAttribute("viewBox", "0 0 24 24");
+              warning_close.addEventListener("click", function() {
+                elements.warning.remove();
+                delete elements.warning;
+              });
+              warning_close_path.setAttribute("d", "M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z");
 
-                  warning_close.appendChild(warning_close_path);
-                  image_removing_warning.appendChild(warning_close);
-                  workplace.appendChild(image_removing_warning);
-                  elements.warning = image_removing_warning;
+              warning_close.appendChild(warning_close_path);
+              image_removing_warning.appendChild(warning_close);
+              workplace.appendChild(image_removing_warning);
+              elements.warning = image_removing_warning;
             }
             buttons.appendChild(close_button);
             add_varaible_container.appendChild(add_varaible_input);
@@ -322,6 +344,7 @@ const create_element = function(name, options) {
             workplace.appendChild(buttons);
             workplace.appendChild(add_varaible_container);
             workplace.appendChild(variable_list);
+            workplace.appendChild(variables_amount);
             workplace.appendChild(download_button);
 
             addEventListener("keydown", function(event) {
@@ -387,6 +410,7 @@ const create_element = function(name, options) {
                   dialog.container.addEventListener("animationend", function() {
                     if (dialog.container) {
                       dialog.container.remove();
+                      document.body.className = "";
                     }
                     delete dialog.container;
                     delete dialog.code_input;
@@ -478,7 +502,7 @@ const create_element = function(name, options) {
                   paste: function() {
                     setTimeout(function() {
                       change_rgba_values(hex_input);
-                    }, 4);
+                    }, 1);
                   }
                 }
               }),
@@ -650,12 +674,10 @@ const create_element = function(name, options) {
                 value: "#" + b16(theme[editing].red) + b16(theme[editing].green) + b16(theme[editing].blue),
                 _listeners: {
                   change: function() {
-                    dialog.color.style.background = this.value;
-                    hex_input.value = "#ff" + this.value.slice(1);
                     red.value = parseInt(this.value.slice(1, 3), 16);
                     green.value = parseInt(this.value.slice(3, 5), 16);
                     blue.value = parseInt(this.value.slice(5, 7), 16);
-                    alpha.value = 255;
+                    change_value();
                   }
                 }
               }),
@@ -684,9 +706,36 @@ const create_element = function(name, options) {
           });
 
           let palette_colors = [];
+
+          if (editing != "chat_wallpaper") {
+            palette_colors.push(create_element("div", {
+              className: "window_palette_color",
+              innerHTML: "Default",
+              data: {
+                color: "#" + b16(defaults[editing].alpha) + b16(defaults[editing].red) + b16(defaults[editing].green) + b16(defaults[editing].blue)
+              },
+              _listeners: {
+                click: function() {
+                  alpha.value = parseInt(this.dataset.color.slice(1, 3), 16);
+                  red.value = parseInt(this.dataset.color.slice(3, 5), 16);
+                  green.value = parseInt(this.dataset.color.slice(5, 7), 16);
+                  blue.value = parseInt(this.dataset.color.slice(7, 9), 16);
+                  change_value();
+                }
+              }
+            }));
+
+            if ((.2126 * parseInt(defaults[editing].red, 16) + .7152 * parseInt(defaults[editing].green, 16) + .0722 * parseInt(defaults[editing].blue, 16)) * (defaults[editing].alpha / 255) > 192) {
+              palette_colors[0].className += " dark-color";
+            }
+            palette_colors[0].style.background = "rgba(" + defaults[editing].red + "," + defaults[editing].green + "," + defaults[editing].blue + "," + (defaults[editing].alpha / 255) + ")";
+            palette_container.appendChild(palette_colors[0]);
+          }
+
           for (k = 0; k < theme_palette.length; k++) {
             let n = palette_colors.push(create_element("div", {
                   className: "window_palette_color",
+                  innerHTML: theme_palette[k],
                   data: {
                     color: theme_palette[k]
                   },
@@ -695,11 +744,14 @@ const create_element = function(name, options) {
                       red.value = parseInt(this.dataset.color.slice(1, 3), 16);
                       green.value = parseInt(this.dataset.color.slice(3, 5), 16);
                       blue.value = parseInt(this.dataset.color.slice(5, 7), 16);
-                      alpha.value = 255;
                       change_value();
                     }
                   }
                 }));
+
+            if ((.2126 * parseInt(theme_palette[k].slice(1, 3), 16) + .7152 * parseInt(theme_palette[k].slice(3, 5), 16) + .0722 * parseInt(theme_palette[k].slice(5, 7), 16)) > 192) {
+              palette_colors[n - 1].className += " dark-color";
+            }
             palette_colors[n - 1].style.background = palette_colors[n - 1].dataset.color;
             palette_container.appendChild(palette_colors[n - 1]);
           }
@@ -739,6 +791,7 @@ const create_element = function(name, options) {
           buttons_container.appendChild(cancel);
         }
         document.body.appendChild(container);
+        document.body.className = "no-overflow";
         history.pushState(null, document.title, location.href + "#");
         history.onpushstate = close_dialog;
         onpopstate = close_dialog;
@@ -750,6 +803,7 @@ const create_element = function(name, options) {
           dialog.container.remove();
           delete dialog.container;
           delete dialog.code_input;
+          document.body.className = "";
         })
         history.onpushstate = null;
         onpopstate = null;
@@ -761,6 +815,7 @@ const create_element = function(name, options) {
       change_value = function() {
         dialog.hex.value = "#" + b16(+dialog.alpha.value) + b16(+dialog.red.value) + b16(+dialog.green.value) + b16(+dialog.blue.value);
         dialog.color.style.background = "rgba(" + dialog.red.value + "," + dialog.green.value + "," + dialog.blue.value + "," + (dialog.alpha.value / 255) + ")";
+        dialog.color_input.value = "#" + b16(+dialog.red.value) + b16(+dialog.green.value) + b16(+dialog.blue.value);
       },
       drag_start = function() {
         drag_from_page = true;
@@ -844,6 +899,7 @@ const create_element = function(name, options) {
           }
         }
         dialog.color.style.background = "rgba(" + dialog.red.value + "," + dialog.green.value + "," + dialog.blue.value + "," + (dialog.alpha.value / 255) + ")";
+        dialog.color_input.value = "#" + b16(+dialog.red.value) + b16(+dialog.green.value) + b16(+dialog.blue.value);
       };
 
 if (!localStorage.theme) {
