@@ -197,6 +197,7 @@ noscript {
   background-image: url("download.svg");
   background-repeat: no-repeat;
   background-position: center;
+  z-index: 3;
 }
 
 .workplace_buttons {
@@ -617,7 +618,7 @@ noscript {
 
 .window_palette_color {
   width: calc(100% / 6);
-  min-width: 48px;
+  min-width: 96px;
   height: 48px;
   flex-grow: 1;
   margin-right: 6px;
