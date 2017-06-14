@@ -141,14 +141,23 @@ const create_element = function(name, options) {
                             red = b16(theme[i].red),
                             blue = b16(theme[i].blue),
                             green = b16(theme[i].green),
-                            hex = "" + red + green + blue;
+                            hex = red + green + blue,
+                            int = (parseInt(alpha + hex, 16) << 0).toString();
 
                           if (alpha == "ff") {
-                            file_content += i + "=#" + hex + "\n";
+                            if (int.length > 7) {
+                              file_content += i + "=#" + hex + "\n";
+                            } else {
+                              file_content += i + "=" + int + "\n";
+                            }
                           } else if (alpha == "00") {
                             file_content += i + "=0\n";
                           } else {
-                            file_content += i + "=#" + alpha + hex + "\n";
+                            if (int.length > 9) {
+                              file_content += i + "=#" + alpha + hex + "\n";
+                            } else {
+                              file_content += i + "=" + int + "\n";
+                            }
                           }
                         }
                       }
@@ -866,6 +875,65 @@ const create_element = function(name, options) {
             }
           }
         }
+
+        theme_palette = theme_palette.sort(function(first_color, second_color) {
+          first_color = to_hsl(first_color);
+          second_color = to_hsl(second_color);
+
+          if (first_color.hue > second_color.hue) {
+            return -1;
+          } else if (first_color.hue < second_color.hue) {
+            return 1;
+          } else if (first_color.saturation > second_color.saturation) {
+            return -1;
+          } else if (first_color.saturation < second_color.saturation) {
+            return 1;
+          } else if (first_color.lightness > second_color.lightness) {
+            return -1;
+          } else if (first_color.lightness < second_color.lightness) {
+            return 1;
+          } else {
+            return 0;
+          }
+        });
+      },
+      to_hsl = function(hex) {
+        let red = parseInt(hex.slice(1, 3), 16) / 255,
+            green = parseInt(hex.slice(3, 5), 16) / 255,
+            blue = parseInt(hex.slice(5, 7), 16) / 255,
+            min = Math.min(red, green, blue),
+            max = Math.max(red, green, blue),
+            lightness = .5 * (max + min),
+            saturation = (max - min) / (1 - Math.abs(1 - (max + min))),
+            hue;
+
+        if (saturation != saturation) {
+          saturation = 0;
+        }
+
+        if (max == min) {
+          hue = 0;
+        } else if (max == red && green >= blue) {
+          hue = 60 * ((green - blue) / (max - min));
+        } else if (max == red && green < blue) {
+          hue = 60 * ((green - blue) / (max - min)) + 360;
+        } else if (max == green) {
+          hue = 60 * ((blue - red) / (max - min)) + 120;
+        } else if (max == blue) {
+          hue = 60 * ((red - green) / (max - min)) + 240;
+        }
+
+        if (max == 0) {
+          saturation = 0;
+        } else {
+          saturation = 1 - (min / max);
+        }
+
+        return {
+          hue: Math.round(hue),
+          saturation: Math.round(saturation * 100) / 100,
+          lightness: Math.round(lightness * 100) / 100
+        };
       },
       change_rgba_values = function(hex_input) {
         if (hex_input.value.slice(0, 1) != "#" && hex_input.value.length != 0) {
