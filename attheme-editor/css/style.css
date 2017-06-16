@@ -194,7 +194,7 @@ noscript {
   border-radius: 28px;
   margin: 0;
   box-shadow: 0 4px 8px rgba(0, 0, 0, .2);
-  background-image: url("download.svg");
+  background-image: url("../img/download.svg");
   background-repeat: no-repeat;
   background-position: center;
   z-index: 3;
@@ -258,11 +258,19 @@ noscript {
 }
 
 .workplace_add-variable-container {
-  position: relative;
-  position: sticky;
   z-index: 2;
+  margin: 0 -24px 12px;
+}
+
+.workplace_add-variable-container.fixed {
+  position: fixed;
   top: 0px;
-  margin: 0 -24px;
+  width: 100%;
+  max-width: 976px;
+}
+
+.workplace_add-variable-container.fixed + .workplace_variables {
+  margin-top: 72px;
 }
 
 .workplace_add-variable_input {
@@ -273,7 +281,7 @@ noscript {
   font-family: inherit;
   caret-color: #424242;
   color: #424242;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, .1);
+  box-shadow: 0 2px 2px rgba(0, 0, 0, .1);
   z-index: 2;
   will-change: box-shadow;
   transition: box-shadow .3s;
@@ -287,7 +295,7 @@ noscript {
 }
 
 .workplace_add-variable_input:focus {
-  box-shadow: 0 8px 8px rgba(0, 0, 0, .2);
+  box-shadow: 0 4px 4px rgba(0, 0, 0, .2);
 }
 
 .workplace_add-variable_input:focus::placeholder {
@@ -302,7 +310,7 @@ noscript {
   display: none;
   position: absolute;
   width: 100%;
-  box-shadow: 0 8px 8px rgba(0, 0, 0, .2);
+  box-shadow: 0 4px 4px rgba(0, 0, 0, .2);
   max-height: 256px;
   overflow: auto;
   padding: 0;
@@ -364,35 +372,52 @@ noscript {
 
 .workplace_variables {
   list-style: none;
-  margin: 0 -24px;
+  margin: 0 -12px;
   padding: 0;
   display: flex;
   flex-wrap: wrap;
   z-index: -1;
-  background-image: url("transparency.svg");
   background-size: 12px 12px;
+  justify-content: space-between;
+}
+
+.workplace_variables_variable-container {
+  width: 100%;
+  flex-shrink: 0;
+  cursor: pointer;
+  background-size: 12px;
+  border-radius: 2px;
+  margin-bottom: 12px;
+}
+
+.workplace_variables_variable-container.transparency {
+  background-image: url("../img/transparency.svg");
 }
 
 .workplace_variables_variable {
   width: 100%;
-  flex-shrink: 0;
   padding: 24px;
   color: #fff;
-  cursor: pointer;
-  will-change: opacity;
-  transition: opacity .3s;
+  will-change: opacity, box-shadow, transform .3s;
+  transition: opacity .3s, box-shadow .3s, transform .3s;
+  border-radius: 2px;
+  box-shadow: 0 2px 2px rgba(0, 0, 0, .1);
+  height: 100%;
 }
 
 .workplace_variables_variable:hover {
-  opacity: .9;
+  box-shadow: 0 4px 4px rgba(0, 0, 0, .1);
+  transform: translateY(-1px);
 }
 
 .workplace_variables_variable:active {
   opacity: .8;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, .1);
+  transform: translateY(1px);
 }
 
 .workplace_variables_variable.dark-text {
-  color: rgba(0, 0, 0, .75);
+  color: rgba(0, 0, 0, .9);
 }
 
 .workplace_variables_variable_name {
@@ -400,14 +425,17 @@ noscript {
   font-size: 24px;
   margin: 0;
   z-index: 2;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, .2);
   word-break: break-all;
+}
+
+.workplace_variables_variable_color {
+  font-family: "Roboto Mono", "Lucida Console", monospace;
+  font-size: 14px;
 }
 
 .workplace_variables_variable_color,
 .workplace_variables_variable_warning {
   margin: 24px 0 0;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, .2);
 }
 
 .workplace_variables-amount {
@@ -443,7 +471,7 @@ noscript {
 .window {
   background: #fff;
   border-radius: 2px;
-  padding: 24px;
+  padding: 24px 24px 12px;
   box-shadow: 0 6px 12px rgba(0, 0, 0, .1);
   animation-name: window-appear;
   animation-duration: .3s;
@@ -469,7 +497,7 @@ noscript {
 
 .window_buttons {
   display: flex;
-  margin-top: 24px;
+  margin-top: 12px;
   flex-direction: row-reverse;
 }
 
@@ -525,21 +553,34 @@ noscript {
   padding: 0;
   font-family: "Roboto Mono", "Lucida Console", monospace;
   line-height: 1.75;
+  will-change: border-bottom-color;
+  transition: border-bottom-color .3s;
+}
+
+.window_textarea {
+  border-radius: 2px;
+  padding: 16px;
+  background: rgba(0, 0, 0, .06);
+  position: relative;
+}
+
+.window_textarea::placeholder {
+  color: rgba(66, 66, 66, .5);
+  will-change: opacity;
+  transition: opacity .3s;
+}
+.window_textarea:focus::placeholder {
+  opacity: .5;
 }
 
 .window_input {
   height: auto;
   padding-bottom: 8px;
-  will-change: border-bottom-color;
-  transition: border-bottom-color .3s;
 }
 
-.window_input:focus {
+.window_input:focus,
+.window_textarea:focus {
   border-bottom-color: #2196f3;
-}
-
-.window_input.error {
-  border-bottom-color: #F44336;
 }
 
 .window_label {
@@ -566,7 +607,7 @@ noscript {
   width: 100%;
   border-radius: 2px;
   height: 64px;
-  background: url("transparency.svg");
+  background: url("../img/transparency.svg");
   background-size: 12px 12px;
   margin: 24px 0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, .1);
@@ -609,7 +650,7 @@ noscript {
 .window_palette:not(:empty) {
   margin-top: 24px;
   overflow: auto;
-  max-height: 128px;
+  max-height: 192px;
   display: flex;
   flex-wrap: wrap;
   position: relative;
@@ -617,7 +658,6 @@ noscript {
 }
 
 .window_palette_color {
-  width: calc(100% / 5);
   min-width: 96px;
   height: 48px;
   flex-grow: 1;
@@ -706,12 +746,12 @@ noscript {
     margin: 0;
   }
 
-  .workplace_variables_variable {
-    width: 50%;
+  .workplace_variables_variable-container {
+    width: calc(50% - 6px);
   }
 
   .workplace_add-variable-container {
-    margin: 0;
+    margin: 0 0 12px;
   }
 
   .workplace_add-variable_suggestions {

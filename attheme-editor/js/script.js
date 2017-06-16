@@ -2,7 +2,7 @@
 
 let workplace = document.querySelector("section"),
     theme = (localStorage.theme) ? JSON.parse(localStorage.theme) : {},
-    elements,
+    elements = {},
     image = false,
     editing = null,
     drag_from_page = false,
@@ -279,6 +279,18 @@ const create_element = function(name, options) {
                 }),
                 amount = 0;
 
+            addEventListener("scroll", function() {
+              if (document.body.scrollTop >= 261) {
+                if (!(add_varaible_container.className.indexOf(" fixed") + 1)) {
+                  add_varaible_container.className += " fixed";
+                }
+              } else {
+                add_varaible_container.className = add_varaible_container.className.replace(" fixed", "");
+              }
+            }, {
+              passive: true
+            });
+
             variables_amount = create_element("div", {
               className: "workplace_variables-amount"
             });
@@ -286,7 +298,10 @@ const create_element = function(name, options) {
             for (k in theme) {
               let alpha = (theme[k].alpha != 0) ? theme[k].alpha / 255 : 0,
                   brightness = (alpha) ? (.2126 * theme[k].red + .7152 * theme[k].green + .0722 * theme[k].blue) / alpha : 255,
-                  variable = create_element("li", {
+                  variable_container = create_element("li", {
+                    className: "workplace_variables_variable-container"
+                  }),
+                  variable = create_element("div", {
                     className: "workplace_variables_variable",
                     _listeners: {
                       click: function() {
@@ -304,6 +319,10 @@ const create_element = function(name, options) {
                     innerHTML: "#" + b16(theme[k].alpha) + b16(theme[k].red) + b16(theme[k].green) + b16(theme[k].blue) + " / " + theme[k].red + ", " + theme[k].green + ", " + theme[k].blue + ", " + theme[k].alpha
                   });
 
+              if (alpha != 1) {
+                variable_container.className += " transparency";
+              }
+
               variable.style.background = "rgba(" + theme[k].red + "," + theme[k].green + "," + theme[k].blue + "," + alpha + ")";
               if (brightness > 192) {
                 variable.className += " dark-text";
@@ -318,8 +337,8 @@ const create_element = function(name, options) {
               }
               variable.dataset.variable = k;
               elements.variables[k] = variable;
-              variable_list.appendChild(variable);
-
+              variable_container.appendChild(variable);
+              variable_list.appendChild(variable_container);
               amount++;
             }
 
@@ -423,7 +442,8 @@ const create_element = function(name, options) {
                     }
                     delete dialog.container;
                     delete dialog.code_input;
-                  })
+                    document.body.style.paddingRight = 0;
+                  });
                   history.onpushstate = null;
                   onpopstate = null;
                   history.back();
@@ -450,7 +470,8 @@ const create_element = function(name, options) {
             }),
             buttons_container = create_element("div", {
               className: "window_buttons"
-            });
+            }),
+            scrollbar_width = innerWidth - document.body.clientWidth;
 
         dialog = create_element("div", {
           className: "window",
@@ -708,6 +729,23 @@ const create_element = function(name, options) {
               green: +dialog.green.value,
               blue: +dialog.blue.value
             }
+
+            if (get_brightness(theme[editing]) > .75) {
+              if (!(elements.variables[editing].className.indexOf(" dark-text") + 1)) {
+                elements.variables[editing].className += " dark-text";
+              }
+            } else {
+              elements.variables[editing].className = elements.variables[editing].className.replace(" dark-text", "");
+            }
+
+            if (theme[editing].alpha != 255) {
+              if (!(elements.variables[editing].parentElement.className.indexOf(" transparency") + 1)) {
+                elements.variables[editing].parentElement.className += " transparency";
+              }
+            } else {
+              elements.variables[editing].parentElement.className = elements.variables[editing].parentElement.className.replace(" transparency", "");
+            }
+
             elements.variables[editing].style.background = "rgba(" + theme[editing].red + "," + theme[editing].green + "," + theme[editing].blue + "," + (theme[editing].alpha / 255) + ")";
             elements.variables[editing].childNodes[1].innerHTML = "#" + b16(theme[editing].alpha) + b16(theme[editing].red) + b16(theme[editing].green) + b16(theme[editing].blue) + " / " + theme[editing].red + ", " + theme[editing].green + ", " + theme[editing].blue + ", " + theme[editing].alpha;
             save_theme();
@@ -716,7 +754,7 @@ const create_element = function(name, options) {
 
           let palette_colors = [];
 
-          if (editing != "chat_wallpaper") {
+          if (editing != "chat_wallpaper" && defaults[editing]) {
             palette_colors.push(create_element("div", {
               className: "window_palette_color",
               innerHTML: "Default",
@@ -734,7 +772,7 @@ const create_element = function(name, options) {
               }
             }));
 
-            if ((.2126 * parseInt(defaults[editing].red, 16) + .7152 * parseInt(defaults[editing].green, 16) + .0722 * parseInt(defaults[editing].blue, 16)) * (defaults[editing].alpha / 255) > 192) {
+            if (get_brightness(defaults[editing]) > .75) {
               palette_colors[0].className += " dark-color";
             }
             palette_colors[0].style.background = "rgba(" + defaults[editing].red + "," + defaults[editing].green + "," + defaults[editing].blue + "," + (defaults[editing].alpha / 255) + ")";
@@ -801,6 +839,7 @@ const create_element = function(name, options) {
         }
         document.body.appendChild(container);
         document.body.className = "no-overflow";
+        document.body.style.paddingRight = scrollbar_width + "px";
         history.pushState(null, document.title, location.href + "#");
         history.onpushstate = close_dialog;
         onpopstate = close_dialog;
@@ -813,7 +852,8 @@ const create_element = function(name, options) {
           delete dialog.container;
           delete dialog.code_input;
           document.body.className = "";
-        })
+          document.body.style.paddingRight = 0;
+        });
         history.onpushstate = null;
         onpopstate = null;
       },
@@ -825,37 +865,6 @@ const create_element = function(name, options) {
         dialog.hex.value = "#" + b16(+dialog.alpha.value) + b16(+dialog.red.value) + b16(+dialog.green.value) + b16(+dialog.blue.value);
         dialog.color.style.background = "rgba(" + dialog.red.value + "," + dialog.green.value + "," + dialog.blue.value + "," + (dialog.alpha.value / 255) + ")";
         dialog.color_input.value = "#" + b16(+dialog.red.value) + b16(+dialog.green.value) + b16(+dialog.blue.value);
-      },
-      drag_start = function() {
-        drag_from_page = true;
-      },
-      drag_enter = function(event) {
-        if (!drag_from_page && workplace.className == "welcome") {
-          document.querySelector(".drag").className = "drag active";
-          console.log(event.target);
-          event.target.ondrop = drop;
-          event.target.addEventListener("drop", drop);
-        }
-      },
-      drag_leave = function() {
-        document.querySelector(".drag").className = "drag"
-      },
-      drop = function(event) {
-        event.preventDefault();
-        console.log("Got the file!");
-        if (!drag_from_page && workplace.className == "welcome") {
-          if (event.dataTransfer.files[0].name.slice(-8) == ".attheme"){
-            let reader = new FileReader();
-            reader.onload = function() {
-              load_theme(reader.result);
-              set_workplace("workplace");
-            };
-            reader.readAsText(event.dataTransfer.files[0]);
-            localStorage.theme_name = event.dataTransfer.files[0].name.replace(".attheme", "");
-          } else {
-            show_dialog("incorrect-file");
-          }
-        }
       },
       generate_theme_palette = function() {
         theme_palette = [];
@@ -968,6 +977,10 @@ const create_element = function(name, options) {
         }
         dialog.color.style.background = "rgba(" + dialog.red.value + "," + dialog.green.value + "," + dialog.blue.value + "," + (dialog.alpha.value / 255) + ")";
         dialog.color_input.value = "#" + b16(+dialog.red.value) + b16(+dialog.green.value) + b16(+dialog.blue.value);
+      },
+      get_brightness = function(color) {
+        let alpha = color.alpha / 255;
+        return (alpha) ? ((.2126 * color.red + .7152 * color.green + .0722 * color.blue) / alpha) / 255 : 255;
       };
 
 if (!localStorage.theme) {
@@ -980,12 +993,6 @@ if (location.href.slice(-2) == "/#") {
   history.replaceState(null, document.title, location.href.slice(0, -2));
 }
 
-// addEventListener("dragstart", drag_start);
-// addEventListener("dragenter", drag_enter);
-// addEventListener("dragleave", drag_leave);
-// document.querySelector(".drag").addEventListener("dragend", drop);
-// document.querySelector(".drag").addEventListener("drop", drop);
-
 if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("service-worker.js");
+  navigator.serviceWorker.register("../service-worker.js");
 }
