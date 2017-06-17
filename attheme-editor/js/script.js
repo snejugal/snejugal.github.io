@@ -12,24 +12,7 @@ let workplace = document.querySelector("section"),
     variables_amount,
     i, k, j;
 
-const create_element = function(name, options) {
-        let element = document.createElement(name);
-        for (i in options) {
-          if (i != "data" && i != "_listeners") {
-            element[i] = options[i];
-          } else if (i == "data") {
-            for (j in options.data) {
-              element.dataset[j] = options.data[j];
-            }
-          } else {
-            for (j in options._listeners) {
-              element.addEventListener(j, options._listeners[j]);
-            }
-          }
-        }
-        return element;
-      },
-      set_workplace = function(to) {
+const set_workplace = function(to) {
         switch(to) {
           case "welcome":
             workplace.className = "welcome";
@@ -142,7 +125,7 @@ const create_element = function(name, options) {
                             blue = b16(theme[i].blue),
                             green = b16(theme[i].green),
                             hex = red + green + blue,
-                            int = (parseInt(alpha + hex, 16) << 0).toString();
+                            int = (b10(alpha + hex) << 0).toString();
 
                           if (alpha == "ff") {
                             if (int.length > 7) {
@@ -221,9 +204,7 @@ const create_element = function(name, options) {
                                           green: defaults[this.innerHTML].green,
                                           blue: defaults[this.innerHTML].blue
                                         }
-                                        let alpha = (theme[this.innerHTML].alpha != 0) ? theme[this.innerHTML].alpha / 255 : 0,
-                                            brightness = (alpha) ? (.2126 * theme[this.innerHTML].red + .7152 * theme[this.innerHTML].green + .0722 * theme[this.innerHTML].blue) / alpha : 255,
-                                            variable = create_element("li", {
+                                        let variable = create_element("li", {
                                               className: "workplace_variables_variable",
                                               _listeners: {
                                                 click: function() {
@@ -241,8 +222,8 @@ const create_element = function(name, options) {
                                               innerHTML: "#" + b16(theme[this.innerHTML].alpha) + b16(theme[this.innerHTML].red) + b16(theme[this.innerHTML].green) + b16(theme[this.innerHTML].blue) + " / " + theme[this.innerHTML].red + ", " + theme[this.innerHTML].green + ", " + theme[this.innerHTML].blue + ", " + theme[this.innerHTML].alpha
                                             });
 
-                                        variable.style.background = "rgba(" + theme[this.innerHTML].red + "," + theme[this.innerHTML].green + "," + theme[this.innerHTML].blue + "," + alpha + ")";
-                                        if (brightness > 192) {
+                                        variable.style.background = css_rgb(theme[this.innerHTML]);
+                                        if (brightness(theme[this.innerHTML]) > .75) {
                                           variable.className += " dark-text";
                                         }
                                         variable.appendChild(variable_name);
@@ -258,7 +239,7 @@ const create_element = function(name, options) {
                                 }));
 
                             if (theme[default_variables[k]]) {
-                              suggestions[suggestion - 1].style.setProperty("--color", "rgba(" + theme[default_variables[k]].red + "," + theme[default_variables[k]].green + "," + theme[default_variables[k]].blue + "," + (theme[default_variables[k]].alpha / 255) + ")");
+                              suggestions[suggestion - 1].style.setProperty("--color", css_rgb(theme[default_variables[k]]));
                               suggestions[suggestion - 1].className += " before-shadow";
                             }
                             elements.suggestions.appendChild(suggestions[suggestion - 1]);
@@ -296,9 +277,7 @@ const create_element = function(name, options) {
             });
             elements.variables = {};
             for (k in theme) {
-              let alpha = (theme[k].alpha != 0) ? theme[k].alpha / 255 : 0,
-                  brightness = (alpha) ? (.2126 * theme[k].red + .7152 * theme[k].green + .0722 * theme[k].blue) / alpha : 255,
-                  variable_container = create_element("li", {
+              let variable_container = create_element("li", {
                     className: "workplace_variables_variable-container"
                   }),
                   variable = create_element("div", {
@@ -316,15 +295,15 @@ const create_element = function(name, options) {
                   }),
                   variable_color = create_element("p", {
                     className: "workplace_variables_variable_color",
-                    innerHTML: "#" + b16(theme[k].alpha) + b16(theme[k].red) + b16(theme[k].green) + b16(theme[k].blue) + " / " + theme[k].red + ", " + theme[k].green + ", " + theme[k].blue + ", " + theme[k].alpha
+                    innerHTML: hex(theme[k]) + " / " + theme[k].red + ", " + theme[k].green + ", " + theme[k].blue + ", " + theme[k].alpha
                   });
 
-              if (alpha != 1) {
+              if (theme[k].alpha != 255) {
                 variable_container.className += " transparency";
               }
 
-              variable.style.background = "rgba(" + theme[k].red + "," + theme[k].green + "," + theme[k].blue + "," + alpha + ")";
-              if (brightness > 192) {
+              variable.style.background = css_rgb(theme[k]);
+              if (brightness(theme[k]) > .75) {
                 variable.className += " dark-text";
               }
               variable.appendChild(variable_name);
@@ -411,10 +390,10 @@ const create_element = function(name, options) {
             }
 
             theme[variable] = {
-              alpha: parseInt(value.slice(0, 2), 16),
-              red: parseInt(value.slice(2, 4), 16),
-              green: parseInt(value.slice(4, 6), 16),
-              blue: parseInt(value.slice(6, 8), 16)
+              alpha: b10(value.slice(0, 2)),
+              red: b10(value.slice(2, 4)),
+              green: b10(value.slice(4, 6)),
+              blue: b10(value.slice(6, 8))
             };
           } else if (rows[i] == "WPS") {
             image = true;
@@ -518,7 +497,7 @@ const create_element = function(name, options) {
                 className: "window_input",
                 placeholder: "#aarrggbb",
                 id: "hex",
-                value: "#" + b16(theme[editing].alpha) + b16(theme[editing].red) + b16(theme[editing].green) + b16(theme[editing].blue),
+                value: hex(theme[editing]),
                 _listeners: {
                   keydown: function(event) {
                     setTimeout(() => {
@@ -704,18 +683,33 @@ const create_element = function(name, options) {
                 value: "#" + b16(theme[editing].red) + b16(theme[editing].green) + b16(theme[editing].blue),
                 _listeners: {
                   change: function() {
-                    red.value = parseInt(this.value.slice(1, 3), 16);
-                    green.value = parseInt(this.value.slice(3, 5), 16);
-                    blue.value = parseInt(this.value.slice(5, 7), 16);
+                    red.value = b10(this.value.slice(1, 3));
+                    green.value = b10(this.value.slice(3, 5));
+                    blue.value = b10(this.value.slice(5, 7));
                     change_value();
                   }
                 }
               }),
               palette_container = create_element("div", {
                 className: "window_palette"
-              });
+              }),
+              preview;
 
-          color.style.background = "rgba(" + theme[editing].red + "," + theme[editing].green + "," + theme[editing].blue + "," + (theme[editing].alpha / 255) + ")";
+          dialog.appendChild(color_container);
+
+          get_preview(editing, function(response) {
+            if (!response.error) {
+              preview = response;
+              dialog.insertBefore(preview.element, color_container);
+              preview.element.setAttribute("class", "window_preview");
+              preview.element.removeAttribute("height");
+              color_container.remove();
+              preview.color(theme);
+              dialog.preview = preview;
+            }
+          });
+
+          color.style.background = css_rgb(theme[editing]);
 
           dialog.red = red;
           dialog.green = green;
@@ -730,7 +724,7 @@ const create_element = function(name, options) {
               blue: +dialog.blue.value
             }
 
-            if (get_brightness(theme[editing]) > .75) {
+            if (brightness(theme[editing]) > .75) {
               if (!(elements.variables[editing].className.indexOf(" dark-text") + 1)) {
                 elements.variables[editing].className += " dark-text";
               }
@@ -746,8 +740,8 @@ const create_element = function(name, options) {
               elements.variables[editing].parentElement.className = elements.variables[editing].parentElement.className.replace(" transparency", "");
             }
 
-            elements.variables[editing].style.background = "rgba(" + theme[editing].red + "," + theme[editing].green + "," + theme[editing].blue + "," + (theme[editing].alpha / 255) + ")";
-            elements.variables[editing].childNodes[1].innerHTML = "#" + b16(theme[editing].alpha) + b16(theme[editing].red) + b16(theme[editing].green) + b16(theme[editing].blue) + " / " + theme[editing].red + ", " + theme[editing].green + ", " + theme[editing].blue + ", " + theme[editing].alpha;
+            elements.variables[editing].style.background = css_rgb(theme[editing]);
+            elements.variables[editing].childNodes[1].innerHTML = hex(theme[editing]) + " / " + theme[editing].red + ", " + theme[editing].green + ", " + theme[editing].blue + ", " + theme[editing].alpha;
             save_theme();
             dialog.container.click();
           });
@@ -759,23 +753,23 @@ const create_element = function(name, options) {
               className: "window_palette_color",
               innerHTML: "Default",
               data: {
-                color: "#" + b16(defaults[editing].alpha) + b16(defaults[editing].red) + b16(defaults[editing].green) + b16(defaults[editing].blue)
+                color: hex(defaults[editing])
               },
               _listeners: {
                 click: function() {
-                  alpha.value = parseInt(this.dataset.color.slice(1, 3), 16);
-                  red.value = parseInt(this.dataset.color.slice(3, 5), 16);
-                  green.value = parseInt(this.dataset.color.slice(5, 7), 16);
-                  blue.value = parseInt(this.dataset.color.slice(7, 9), 16);
+                  alpha.value = b10(this.dataset.color.slice(1, 3));
+                  red.value = b10(this.dataset.color.slice(3, 5));
+                  green.value = b10(this.dataset.color.slice(5, 7));
+                  blue.value = b10(this.dataset.color.slice(7, 9));
                   change_value();
                 }
               }
             }));
 
-            if (get_brightness(defaults[editing]) > .75) {
+            if (brightness(defaults[editing]) > .75) {
               palette_colors[0].className += " dark-color";
             }
-            palette_colors[0].style.background = "rgba(" + defaults[editing].red + "," + defaults[editing].green + "," + defaults[editing].blue + "," + (defaults[editing].alpha / 255) + ")";
+            palette_colors[0].style.background = css_rgb(defaults[editing]);
             palette_container.appendChild(palette_colors[0]);
           }
 
@@ -788,22 +782,25 @@ const create_element = function(name, options) {
                   },
                   _listeners: {
                     click: function() {
-                      red.value = parseInt(this.dataset.color.slice(1, 3), 16);
-                      green.value = parseInt(this.dataset.color.slice(3, 5), 16);
-                      blue.value = parseInt(this.dataset.color.slice(5, 7), 16);
+                      red.value = b10(this.dataset.color.slice(1, 3));
+                      green.value = b10(this.dataset.color.slice(3, 5));
+                      blue.value = b10(this.dataset.color.slice(5, 7));
                       change_value();
                     }
                   }
-                }));
+                })) - 1;
 
-            if ((.2126 * parseInt(theme_palette[k].slice(1, 3), 16) + .7152 * parseInt(theme_palette[k].slice(3, 5), 16) + .0722 * parseInt(theme_palette[k].slice(5, 7), 16)) > 192) {
-              palette_colors[n - 1].className += " dark-color";
+            if (brightness({
+                  red: b10(theme_palette[k].slice(1, 3)),
+                  green: b10(theme_palette[k].slice(3, 5)),
+                  blue: b10(theme_palette[k].slice(5, 7))
+                }) > .75) {
+              palette_colors[n].className += " dark-color";
             }
-            palette_colors[n - 1].style.background = palette_colors[n - 1].dataset.color;
-            palette_container.appendChild(palette_colors[n - 1]);
+            palette_colors[n].style.background = palette_colors[n].dataset.color;
+            palette_container.appendChild(palette_colors[n]);
           }
 
-          dialog.appendChild(color_container);
           dialog.appendChild(color_input);
           dialog.appendChild(hex_input_label);
           dialog.appendChild(hex_input);
@@ -834,7 +831,7 @@ const create_element = function(name, options) {
         dialog.appendChild(buttons_container);
         dialog.ok = ok;
         buttons_container.appendChild(ok);
-        if (type != "incorrect-file"){
+        if (type != "incorrect-file") {
           buttons_container.appendChild(cancel);
         }
         document.body.appendChild(container);
@@ -857,13 +854,30 @@ const create_element = function(name, options) {
         history.onpushstate = null;
         onpopstate = null;
       },
-      b16 = function(number) {
-        number = number.toString(16);
-        return new Array(3 - number.length).join("0") + number;
-      },
       change_value = function() {
-        dialog.hex.value = "#" + b16(+dialog.alpha.value) + b16(+dialog.red.value) + b16(+dialog.green.value) + b16(+dialog.blue.value);
-        dialog.color.style.background = "rgba(" + dialog.red.value + "," + dialog.green.value + "," + dialog.blue.value + "," + (dialog.alpha.value / 255) + ")";
+        dialog.hex.value = hex({
+          red: +dialog.red.value,
+          green: +dialog.green.value,
+          blue: +dialog.blue.value,
+          alpha: +dialog.alpha.value
+        });
+        if (!dialog.preview) {
+          dialog.color.style.background = css_rgb({
+            red: +dialog.red.value,
+            green: +dialog.green.value,
+            blue: +dialog.blue.value,
+            alpha: +dialog.alpha.value
+          });
+        } else {
+          let recolor = {};
+          recolor[editing] = css_rgb({
+            red: +dialog.red.value,
+            green: +dialog.green.value,
+            blue: +dialog.blue.value,
+            alpha: +dialog.alpha.value
+          });
+          dialog.preview.color(recolor);
+        }
         dialog.color_input.value = "#" + b16(+dialog.red.value) + b16(+dialog.green.value) + b16(+dialog.blue.value);
       },
       generate_theme_palette = function() {
@@ -906,81 +920,55 @@ const create_element = function(name, options) {
           }
         });
       },
-      to_hsl = function(hex) {
-        let red = parseInt(hex.slice(1, 3), 16) / 255,
-            green = parseInt(hex.slice(3, 5), 16) / 255,
-            blue = parseInt(hex.slice(5, 7), 16) / 255,
-            min = Math.min(red, green, blue),
-            max = Math.max(red, green, blue),
-            lightness = .5 * (max + min),
-            saturation = (max - min) / (1 - Math.abs(1 - (max + min))),
-            hue;
-
-        if (saturation != saturation) {
-          saturation = 0;
-        }
-
-        if (max == min) {
-          hue = 0;
-        } else if (max == red && green >= blue) {
-          hue = 60 * ((green - blue) / (max - min));
-        } else if (max == red && green < blue) {
-          hue = 60 * ((green - blue) / (max - min)) + 360;
-        } else if (max == green) {
-          hue = 60 * ((blue - red) / (max - min)) + 120;
-        } else if (max == blue) {
-          hue = 60 * ((red - green) / (max - min)) + 240;
-        }
-
-        if (max == 0) {
-          saturation = 0;
-        } else {
-          saturation = 1 - (min / max);
-        }
-
-        return {
-          hue: Math.round(hue),
-          saturation: Math.round(saturation * 100) / 100,
-          lightness: Math.round(lightness * 100) / 100
-        };
-      },
       change_rgba_values = function(hex_input) {
         if (hex_input.value.slice(0, 1) != "#" && hex_input.value.length != 0) {
           hex_input.value = "#" + hex_input.value;
         }
 
         for (i = 1; i < hex_input.value.length; i++) {
-          if (parseInt(hex_input.value[i], 16) != parseInt(hex_input.value[i], 16)) {
+          if (b10(hex_input.value[i]) != b10(hex_input.value[i])) {
             hex_input.value = hex_input.value.slice(0, i);
           }
         }
 
         if (hex_input.value.length == 9) {
-          dialog.alpha.value = parseInt(hex_input.value.slice(1, 3), 16);
-          dialog.red.value = parseInt(hex_input.value.slice(3, 5), 16);
-          dialog.green.value = parseInt(hex_input.value.slice(5, 7), 16);
-          dialog.blue.value = parseInt(hex_input.value.slice(7, 9), 16);
+          dialog.alpha.value = b10(hex_input.value.slice(1, 3));
+          dialog.red.value = b10(hex_input.value.slice(3, 5));
+          dialog.green.value = b10(hex_input.value.slice(5, 7));
+          dialog.blue.value = b10(hex_input.value.slice(7, 9));
         } else {
           dialog.alpha.value = 255;
           dialog.red.value = 0;
           dialog.green.value = 0;
           dialog.blue.value = 0;
           if (hex_input.value.length > 2) {
-            dialog.red.value = parseInt(hex_input.value.slice(1, 3), 16);
+            dialog.red.value = b10(hex_input.value.slice(1, 3));
           }
           if (hex_input.value.length > 4) {
-            dialog.green.value = parseInt(hex_input.value.slice(3, 5), 16);
+            dialog.green.value = b10(hex_input.value.slice(3, 5));
           }
           if (hex_input.value.length > 6) {
-            dialog.blue.value = parseInt(hex_input.value.slice(5, 7), 16);
+            dialog.blue.value = b10(hex_input.value.slice(5, 7));
           }
         }
-        dialog.color.style.background = "rgba(" + dialog.red.value + "," + dialog.green.value + "," + dialog.blue.value + "," + (dialog.alpha.value / 255) + ")";
+        if (!dialog.preview) {
+          dialog.color.style.background = css_rgb({
+            red: +dialog.red.value,
+            green: +dialog.green.value,
+            blue: +dialog.blue.value,
+            alpha: +dialog.alpha.value
+          });
+        } else {
+          let recolor = {};
+          recolor[editing] = css_rgb({
+            red: +dialog.red.value,
+            green: +dialog.green.value,
+            blue: +dialog.blue.value,
+            alpha: +dialog.alpha.value
+          });
+          dialog.preview.color(recolor);
+        }
         dialog.color_input.value = "#" + b16(+dialog.red.value) + b16(+dialog.green.value) + b16(+dialog.blue.value);
-      },
-      get_brightness = function(color) {
-        let alpha = color.alpha / 255;
-        return (alpha) ? ((.2126 * color.red + .7152 * color.green + .0722 * color.blue) / alpha) / 255 : 255;
       };
 
 if (!localStorage.theme) {

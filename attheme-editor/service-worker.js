@@ -3,13 +3,13 @@ self.addEventListener("install", function(event) {
     caches.open("attheme-editor").then(function(cache) {
       return cache.addAll([
         "index.html",
-        "default_values.js",
-        "script.js",
-        "style.css",
-        "transparency.svg",
-        "favicon.png",
+        "js/default_values.js",
+        "js/script.js",
+        "css/style.css",
+        "img/transparency.svg",
+        "img/favicon.png",
         "/attheme-editor/",
-        "download.svg"
+        "img/download.svg"
       ]).then(function() {
         self.skipWaiting();
       });

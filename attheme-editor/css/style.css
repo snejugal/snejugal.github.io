@@ -388,6 +388,9 @@ noscript {
   background-size: 12px;
   border-radius: 2px;
   margin-bottom: 12px;
+  box-shadow: 0 2px 2px rgba(0, 0, 0, .1);
+  will-change: opacity, box-shadow, transform .3s;
+  transition: opacity .3s, box-shadow .3s, transform .3s;
 }
 
 .workplace_variables_variable-container.transparency {
@@ -398,19 +401,16 @@ noscript {
   width: 100%;
   padding: 24px;
   color: #fff;
-  will-change: opacity, box-shadow, transform .3s;
-  transition: opacity .3s, box-shadow .3s, transform .3s;
   border-radius: 2px;
-  box-shadow: 0 2px 2px rgba(0, 0, 0, .1);
   height: 100%;
 }
 
-.workplace_variables_variable:hover {
+.workplace_variables_variable-container:hover {
   box-shadow: 0 4px 4px rgba(0, 0, 0, .1);
   transform: translateY(-1px);
 }
 
-.workplace_variables_variable:active {
+.workplace_variables_variable-container:active {
   opacity: .8;
   box-shadow: 0 1px 1px rgba(0, 0, 0, .1);
   transform: translateY(1px);
@@ -601,6 +601,11 @@ noscript {
   width: calc((100% - 72px) / 4);
   display: block;
   margin: 0;
+}
+
+.window_preview {
+  width: calc(100% + 48px);
+  margin: 0 -24px 24px;
 }
 
 .window_color-container {
