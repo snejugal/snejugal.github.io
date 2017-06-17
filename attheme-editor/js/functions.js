@@ -1,7 +1,7 @@
 "use strict";
 
 const get_preview = function(variable, callback) {
-        let request = fetch("../variables-previews/" + variable + ".svg").then(function(response) {
+        let request = fetch("variables-previews/" + variable + ".svg").then(function(response) {
               if (response.ok) {
                 response.text().then(function(text) {
                   let svg = new DOMParser().parseFromString(text, "text/xml"),
