@@ -109,10 +109,10 @@ const get_preview = function(variable, callback) {
         return parseInt(number, 16);
       },
       css_rgb = function(color) {
-        let alpha = (color.alpha) ? color.alpha : 255;
+        let alpha = (color.alpha !== undefined) ? color.alpha : 255;
         return "rgba(" + color.red + "," + color.green + "," + color.blue + "," + (alpha / 255) + ")";
       },
       hex = function(color) {
-        let alpha = (color.alpha) ? color.alpha : 255;
+        let alpha = (color.alpha !== undefined) ? color.alpha : 255;
         return "#" + b16(color.alpha) + b16(color.red) + b16(color.green) + b16(color.blue);
       };

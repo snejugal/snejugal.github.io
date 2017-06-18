@@ -266,7 +266,6 @@ noscript {
   position: fixed;
   top: 0px;
   width: 100%;
-  max-width: 976px;
 }
 
 .workplace_add-variable-container.fixed + .workplace_variables {
@@ -315,6 +314,7 @@ noscript {
   overflow: auto;
   padding: 0;
   -webkit-overflow-scrolling: touch;
+  max-width: 976px;
 }
 
 .workplace_add-variable_input:focus + .workplace_add-variable_suggestions,
