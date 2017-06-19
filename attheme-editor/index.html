@@ -11,7 +11,7 @@
   </head>
   <body>
     <script async>
-      if (new Date().getHours() > 22 || new Date().getHours() < 7 || localStorage.dark) {
+      if (new Date().getHours() > 21 || new Date().getHours() < 7 || localStorage.dark) {
         document.body.className += "dark";
         document.querySelector("meta[name='theme-color']").content = "#424242";
         sessionStorage.dark = true;
