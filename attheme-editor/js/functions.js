@@ -102,7 +102,7 @@ const get_preview = function(variable, callback) {
         };
       },
       brightness = function(color) {
-        let alpha = (color.alpha) ? color.alpha / 255 : 1;
+        let alpha = (color.alpha !== undefined) ? color.alpha / 255 : 1;
         return (alpha) ? ((.2126 * color.red + .7152 * color.green + .0722 * color.blue) / alpha) / 255 : 255;
       },
       b10 = function(number) {

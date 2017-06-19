@@ -10,9 +10,17 @@
     <base href="/attheme-editor/">
   </head>
   <body>
+    <script async>
+      if (new Date().getHours() > 22 || new Date().getHours() < 7 || localStorage.dark) {
+        document.body.className += "dark";
+        document.querySelector("meta[name='theme-color']").content = "#424242";
+        sessionStorage.dark = true;
+      }
+    </script>
     <header>
       <div class="container">
-        <h1>.attheme editor</h1>
+        <h1 class="header-title">.attheme editor</h1>
+        <button class="change-theme"></button>
       </div>
     </header>
     <section>

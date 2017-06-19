@@ -5,7 +5,6 @@ let workplace = document.querySelector("section"),
     elements = {},
     image = false,
     editing = null,
-    drag_from_page = false,
     suggestions,
     dialog,
     theme_palette = (localStorage.palette) ? JSON.parse(localStorage.palette) : [],
@@ -58,10 +57,6 @@ const set_workplace = function(to) {
                     }
                   }
                 }),
-                moving_hint = create_element("p", {
-                  innerHTML: "or drag an .attheme file here",
-                  className: "welcome_hint"
-                }),
                 file_input = create_element("input", {
                   type: "file",
                   _listeners: {
@@ -86,7 +81,6 @@ const set_workplace = function(to) {
             buttons_container.appendChild(open_theme);
             buttons_container.appendChild(copy_theme_code);
             workplace.appendChild(buttons_container);
-            // workplace.appendChild(moving_hint),
             workplace.appendChild(file_input);
             break;
           case "workplace":
@@ -412,22 +406,14 @@ const set_workplace = function(to) {
         let container = create_element("div", {
               className: "window-container",
               _listeners: {
-                click: function() {
-                  dialog.container.className = "window-container disappear";
-                  dialog.container.addEventListener("animationend", function() {
-                    if (dialog.container) {
-                      dialog.container.remove();
-                      document.body.className = "";
-                    }
-                    delete dialog.container;
-                    delete dialog.code_input;
-                    document.body.style.paddingRight = 0;
-                  });
-                  history.onpushstate = null;
-                  onpopstate = null;
+                click: function(event) {
+                  close_dialog(event);
                   history.back();
                 }
               }
+            }),
+            content_container = create_element("div", {
+              className: "window_container"
             }),
             title = create_element("h1", {
               className: "window_title"
@@ -463,7 +449,7 @@ const set_workplace = function(to) {
 
         dialog.container = container;
         container.appendChild(dialog);
-        dialog.appendChild(title);
+        content_container.appendChild(title);
 
         if (type == "code_putting") {
           title.innerHTML = "Put your theme's code";
@@ -473,7 +459,7 @@ const set_workplace = function(to) {
             placeholder: "Put the code here..."
           });
 
-          dialog.appendChild(code_input);
+          content_container.appendChild(code_input);
           ok.addEventListener("click", function() {
             load_theme(elements.code_input.value);
             dialog.container.click();
@@ -481,6 +467,7 @@ const set_workplace = function(to) {
             set_workplace("workplace");
           });
           elements.code_input = code_input;
+          container.className += " full-width";
         } else if (type == "closing_theme") {
           title.innerHTML = "Are you sure you want to stop working on the theme and close it?";
           ok.addEventListener("click", function() {
@@ -695,12 +682,12 @@ const set_workplace = function(to) {
               }),
               preview;
 
-          dialog.appendChild(color_container);
+          content_container.appendChild(color_container);
 
           get_preview(editing, function(response) {
             if (!response.error) {
               preview = response;
-              dialog.insertBefore(preview.element, color_container);
+              content_container.insertBefore(preview.element, color_container);
               preview.element.setAttribute("class", "window_preview");
               preview.element.removeAttribute("height");
               color_container.remove();
@@ -801,11 +788,11 @@ const set_workplace = function(to) {
             palette_container.appendChild(palette_colors[n]);
           }
 
-          dialog.appendChild(color_input);
-          dialog.appendChild(hex_input_label);
-          dialog.appendChild(hex_input);
-          dialog.appendChild(rgba);
-          dialog.appendChild(palette_container);
+          content_container.appendChild(color_input);
+          content_container.appendChild(hex_input_label);
+          content_container.appendChild(hex_input);
+          content_container.appendChild(rgba);
+          content_container.appendChild(palette_container);
 
           color_container.appendChild(color);
           rgba.appendChild(red_label);
@@ -820,6 +807,8 @@ const set_workplace = function(to) {
 
           dialog.color = color;
           dialog.color_input = color_input;
+
+          container.className += " full-width";
         } else if (type == "incorrect-file") {
           title.innerHTML = "You selected a file with an incorrect extension (it should be .attheme)";
           ok.innerHTML = "Got it";
@@ -828,6 +817,18 @@ const set_workplace = function(to) {
           });
         }
 
+        if (!localStorage.dark || !sessionStorage.dark) {
+          document.querySelector("meta[name='theme-color']").content = "#5f5f5f";
+        } else {
+          document.querySelector("meta[name='theme-color']").content = "#1a1a1a";
+        }
+
+        dialog.content_container = content_container;
+        if (screen.width / devicePixelRatio < 500) {
+          dialog.content_container.style.maxHeight = innerHeight - 52 + "px";
+          dialog.parentElement.style.paddingBottom = screen.availHeight - innerHeight + "px";
+        }
+        dialog.appendChild(content_container);
         dialog.appendChild(buttons_container);
         dialog.ok = ok;
         buttons_container.appendChild(ok);
@@ -835,7 +836,7 @@ const set_workplace = function(to) {
           buttons_container.appendChild(cancel);
         }
         document.body.appendChild(container);
-        document.body.className = "no-overflow";
+        document.body.className += " no-overflow";
         document.body.style.paddingRight = scrollbar_width + "px";
         history.pushState(null, document.title, location.href + "#");
         history.onpushstate = close_dialog;
@@ -844,11 +845,18 @@ const set_workplace = function(to) {
       close_dialog = function(event) {
         event.preventDefault();
         dialog.container.className = "window-container disappear";
+        if (!localStorage.dark || !sessionStorage.dark) {
+          document.querySelector("meta[name='theme-color']").content = "#eee";
+        } else {
+          document.querySelector("meta[name='theme-color']").content = "#424242";
+        }
         dialog.container.addEventListener("animationend", function() {
-          dialog.container.remove();
+          if (dialog.container) {
+            dialog.container.remove();
+          }
           delete dialog.container;
           delete dialog.code_input;
-          document.body.className = "";
+          document.body.className = document.body.className.replace(" no-overflow", "");
           document.body.style.paddingRight = 0;
         });
         history.onpushstate = null;
@@ -984,3 +992,25 @@ if (location.href.slice(-2) == "/#") {
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("service-worker.js");
 }
+
+document.querySelector(".change-theme").addEventListener("click", function(event) {
+  event.preventDefault();
+  if (document.body.className.indexOf("dark") + 1) {
+    document.body.className = document.body.className.replace("dark", "");
+    document.querySelector("meta[name='theme-color']").content = "#eee";
+    localStorage.removeItem("dark");
+    sessionStorage.removeItem("dark");
+  } else {
+    document.body.className += " dark";
+    document.querySelector("meta[name='theme-color']").content = "#424242";
+    localStorage.dark = true;
+    sessionStorage.dark = true;
+  }
+});
+
+addEventListener("resize", function() {
+  if (dialog && screen.width / devicePixelRatio < 500) {
+    dialog.content_container.style.maxHeight = innerHeight - 52 + "px";
+    dialog.parentElement.style.paddingBottom = screen.availHeight - innerHeight + "px";
+  }
+});
