@@ -1,6 +1,5 @@
 self.addEventListener("install", function(event) {
-  event.waitUntil(caches.delete("attheme-editor").then(function() {
-    caches.open("attheme-editor").then(function(cache) {
+  event.waitUntil(caches.open("attheme-editor").then(function(cache) {
       return cache.addAll([
         "index.html",
         "js/default_values.js",
