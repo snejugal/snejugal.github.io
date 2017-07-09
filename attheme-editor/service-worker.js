@@ -1,17 +1,21 @@
 self.addEventListener("install", function(event) {
   event.waitUntil(caches.open("attheme-editor").then(function(cache) {
-      return cache.addAll([
-        "index.html",
-        "js/default_values.js",
-        "js/script.js",
-        "css/style.css",
-        "img/transparency.svg",
-        "img/favicon.png",
-        "/attheme-editor/",
-        "img/download.svg"
-      ]).then(function() {
-        self.skipWaiting();
-      });
+    return cache.addAll([
+      "index.html",
+      "js/color.js",
+      "js/values.js",
+      "js/script.js",
+      "js/functions.js",
+      "css/style.css",
+      "img/transparency.svg",
+      "img/dark-transparency.svg",
+      "img/favicon.png",
+      "/attheme-editor/",
+      "img/download.svg",
+      "img/light.svg",
+      "img/dark.svg"
+    ]).then(function() {
+      self.skipWaiting();
     });
   }));
 });
@@ -32,12 +36,12 @@ self.addEventListener("activate", function(event) {
 
 self.addEventListener("fetch", function(event) {
   event.respondWith(caches.match(event.request).then(function(response) {
-    if ("onLine" in navigator && navigator.onLine) {
-      response = fetch(event.request) || response;
+
+    if (event.request.url.indexOf("/variables-previews/") == -1 && "onLine" in navigator && navigator.onLine) {
       if (event.request.url.slice(0, 4) == "http") {
         recache(event.request);
       }
-      return response;
+      return fetch(event.request) || response;
     }
     return response || fetch(event.request);
   }));

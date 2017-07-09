@@ -1,7 +1,9 @@
 "use strict";
 
-const get_preview = function(variable, callback) {
-        let request = fetch("variables-previews/" + variable + ".svg").then(function(response) {
+const get_preview = function(variable) {
+        return new Promise(function(resolve, reject) {
+          if (previews[variable]) {
+            let request = fetch(`variables-previews/${previews[variable]}.svg`).then(function(response) {
               if (response.ok) {
                 response.text().then(function(text) {
                   let svg = new DOMParser().parseFromString(text, "text/xml"),
@@ -10,19 +12,19 @@ const get_preview = function(variable, callback) {
 
                   for (let i = 0; i < changable_elements.length; i++) {
                     let variable = changable_elements[i].className.baseVal;
-                    changable_elements[i].style.fill = css_rgb(defaults[variable]);
+                    changable_elements[i].style.fill = Color.cssrgb(defaults[variable]);
                   }
 
-                  callback({
+                  resolve({
                     color: function(colors) {
                       for (let i in colors) {
-                        let elements = this.element.querySelectorAll("." + i),
+                        let elements = this.tree.querySelectorAll(`.${i}`),
                             color;
 
                         if (typeof(colors[i]) == "string") {
                           color = colors[i];
                         } else if (typeof(colors[i]) == "object") {
-                          color = css_rgb(colors[i]);
+                          color = Color.cssrgb(colors[i]);
                         } else {
                           continue;
                         }
@@ -32,27 +34,34 @@ const get_preview = function(variable, callback) {
                         }
                       }
                     },
-                    element: tree
+                    tree: tree,
+                    customizable_elements: changable_elements
                   });
                 })
               } else {
-                return {
-                  error: true
-                };
+                reject({
+                  error: "Error while loading"
+                })
               }
+            })
+          } else {
+            reject({
+              error: "No preview exists"
             });
+          }
+        });
       },
       create_element = function(name, options) {
         let element = document.createElement(name);
-        for (i in options) {
+        for (let i in options) {
           if (i != "data" && i != "_listeners") {
             element[i] = options[i];
           } else if (i == "data") {
-            for (j in options.data) {
+            for (let j in options.data) {
               element.dataset[j] = options.data[j];
             }
           } else {
-            for (j in options._listeners) {
+            for (let j in options._listeners) {
               element.addEventListener(j, options._listeners[j]);
             }
           }
@@ -63,56 +72,73 @@ const get_preview = function(variable, callback) {
         number = number.toString(16);
         return new Array(3 - number.length).join("0") + number;
       },
-      to_hsl = function(hex) {
-        let red = b10(hex.slice(1, 3)) / 255,
-            green = b10(hex.slice(3, 5)) / 255,
-            blue = b10(hex.slice(5, 7)) / 255,
-            min = Math.min(red, green, blue),
-            max = Math.max(red, green, blue),
-            lightness = .5 * (max + min),
-            saturation = (max - min) / (1 - Math.abs(1 - (max + min))),
-            hue;
-
-        if (saturation != saturation) {
-          saturation = 0;
-        }
-
-        if (max == min) {
-          hue = 0;
-        } else if (max == red && green >= blue) {
-          hue = 60 * ((green - blue) / (max - min));
-        } else if (max == red && green < blue) {
-          hue = 60 * ((green - blue) / (max - min)) + 360;
-        } else if (max == green) {
-          hue = 60 * ((blue - red) / (max - min)) + 120;
-        } else if (max == blue) {
-          hue = 60 * ((red - green) / (max - min)) + 240;
-        }
-
-        if (max == 0) {
-          saturation = 0;
-        } else {
-          saturation = 1 - (min / max);
-        }
-
-        return {
-          hue: Math.round(hue),
-          saturation: Math.round(saturation * 100) / 100,
-          lightness: Math.round(lightness * 100) / 100
-        };
-      },
-      brightness = function(color) {
-        let alpha = (color.alpha !== undefined) ? color.alpha / 255 : 1;
-        return (alpha) ? ((.2126 * color.red + .7152 * color.green + .0722 * color.blue) / alpha) / 255 : 255;
-      },
       b10 = function(number) {
         return parseInt(number, 16);
       },
-      css_rgb = function(color) {
-        let alpha = (color.alpha !== undefined) ? color.alpha : 255;
-        return "rgba(" + color.red + "," + color.green + "," + color.blue + "," + (alpha / 255) + ")";
+      sort_colors = function(first_color, second_color) {
+        first_color = Color.hsl(first_color);
+        second_color = Color.hsl(second_color);
+
+        if (first_color.hue > second_color.hue) {
+          return -1;
+        } else if (first_color.hue < second_color.hue) {
+          return 1;
+        } else if (first_color.saturation > second_color.saturation) {
+          return -1;
+        } else if (first_color.saturation < second_color.saturation) {
+          return 1;
+        } else if (first_color.lightness > second_color.lightness) {
+          return -1;
+        } else if (first_color.lightness < second_color.lightness) {
+          return 1;
+        } else {
+          return 0;
+        }
       },
-      hex = function(color) {
-        let alpha = (color.alpha !== undefined) ? color.alpha : 255;
-        return "#" + b16(color.alpha) + b16(color.red) + b16(color.green) + b16(color.blue);
+      show_suggestion_list = function(search) {
+        elements.suggestions.innerHTML = "";
+        suggestions = {};
+        for (let k = 0; k < default_variables.length; k++) {
+          let query = search.toLowerCase(),
+              variable = default_variables[k].toLowerCase();
+
+          while (query.indexOf("_") + 1 || variable.indexOf("_") + 1 || query.indexOf(" ") + 1 || variable.indexOf(" ") + 1) {
+            query = query.replace("_", "");
+            query = query.replace(" ", "");
+            variable = variable.replace("_", "");
+            variable = variable.replace(" ", "");
+          }
+
+          if (variable.indexOf(query) + 1) {
+            suggestions[default_variables[k]] = create_element("li", {
+              innerHTML: default_variables[k],
+              className: "workplace_add-variable_suggestion",
+              _listeners: {
+                click: function() {
+                  if (!theme[this.innerHTML]) {
+                    variables_amount.innerHTML = `${parseInt(variables_amount.innerHTML) + 1} of ${default_variables.length} variables are added to your theme`;
+                    theme[this.innerHTML] = {
+                      alpha: defaults[this.innerHTML].alpha,
+                      red: defaults[this.innerHTML].red,
+                      green: defaults[this.innerHTML].green,
+                      blue: defaults[this.innerHTML].blue
+                    }
+                    new_variable_element(this.innerHTML, elements.variable_list);
+                  }
+                  editing = this.innerHTML;
+                  show_dialog("variable-edit");
+                }
+              }
+            });
+
+            if (theme[default_variables[k]]) {
+              suggestions[default_variables[k]].style.setProperty("--color", Color.cssrgb(theme[default_variables[k]]));
+              suggestions[default_variables[k]].className += " before-shadow";
+            }
+            elements.suggestions.appendChild(suggestions[default_variables[k]]);
+            if (Object.keys(suggestions).length == 1) {
+              suggestions[default_variables[k]].className += " focused";
+            }
+          }
+        }
       };
