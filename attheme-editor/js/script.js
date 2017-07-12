@@ -79,6 +79,10 @@ const header = document.querySelector("header"),
                       }
                     }
                   }
+                }),
+                drop_hint = create_element("p", {
+                  className: "welcome_drop-hint",
+                  innerHTML: "or drop an .attheme file here"
                 });
 
             workplace.appendChild(title);
@@ -86,6 +90,7 @@ const header = document.querySelector("header"),
             buttons_container.appendChild(open_theme);
             buttons_container.appendChild(copy_theme_code);
             workplace.appendChild(buttons_container);
+            workplace.appendChild(drop_hint);
             workplace.appendChild(file_input);
             title = null;
             buttons_container = null;
@@ -846,7 +851,11 @@ const header = document.querySelector("header"),
           variable_container = null;
         }, 0);
         return variable_container;
-      };
+      },
+      drag_hint = create_element("div", {
+        className: "drag",
+        innerHTML: "Drop an .attheme file here"
+      });
 
 if (!localStorage.theme) {
   set_workplace("welcome");
@@ -916,4 +925,40 @@ addEventListener("keydown", function(event) {
   if (dialog && event.key == "Escape") {
     dialog.container.click();
   }
+});
+
+addEventListener("dragenter", function() {
+  drag_hint.className += " shown";
+});
+
+addEventListener("dragleave", function() {
+  drag_hint.className = drag_hint.className.replace(" shown", "");
+});
+
+document.body.appendChild(drag_hint);
+
+document.addEventListener("dragover", function(event) {
+  event.preventDefault();
+});
+
+document.addEventListener("drop", function(event) {
+  drag_hint.className = drag_hint.className.replace(" shown", "");
+  event.preventDefault();
+  for (let i = 0; i < event.dataTransfer.files.length; i++) {
+    if (event.dataTransfer.files[i].name.slice(-8) == ".attheme") {
+      image = false;
+      theme = {};
+      let reader = new FileReader();
+      reader.onload = function() {
+        load_theme(reader.result);
+        set_workplace("workplace");
+      };
+      reader.readAsText(event.dataTransfer.files[i]);
+      localStorage.theme_name = event.dataTransfer.files[i].name.replace(".attheme", "");
+
+      return;
+    }
+  }
+
+  show_dialog("incorrect-file");
 });
