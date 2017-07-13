@@ -749,7 +749,11 @@ const header = document.querySelector("header"),
           }
         }
         color = `#${b16(color.red)}${b16(color.green)}${b16(color.blue)}`;
-        theme_palette.splice(theme_palette.indexOf(color), 1);
+        let index = theme_palette.indexOf(color);
+        if (index != -1) {
+          theme_palette.splice(theme_palette.indexOf(color), 1);
+        }
+        index = null;
       },
       generate_theme_palette = function() {
         theme_palette = [];
