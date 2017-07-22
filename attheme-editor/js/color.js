@@ -26,10 +26,8 @@ const Color = function(color_) {
             placeholder: options.placeholder || "#aarrggbb",
             value: this.hex || "",
             className: options.class || "",
-            id: options.id || "",
             type: "text",
             color: this,
-            hex: true,
             update: function() {
               this.value = this.color.hex;
             },
@@ -75,7 +73,6 @@ const Color = function(color_) {
             type: "number",
             max: 255,
             min: 0,
-            rgb: true,
             update: function() {
               this.value = this.color.red;
             },
@@ -100,7 +97,6 @@ const Color = function(color_) {
             type: "number",
             max: 255,
             min: 0,
-            rgb: true,
             update: function() {
               this.value = this.color.green;
             },
@@ -125,7 +121,6 @@ const Color = function(color_) {
             type: "number",
             max: 255,
             min: 0,
-            rgb: true,
             update: function() {
               this.value = this.color.blue;
             },
@@ -157,6 +152,94 @@ const Color = function(color_) {
       }, 0);
       return [red, green, blue];
     };
+    color.create_hsl_inputs = function(options = {}) {
+      let hue = create_element("input", {
+            placeholder: options.hue_placeholder || Math.floor(Math.random() * 360),
+            value: Math.round(this.hue),
+            className: options.class || "",
+            color: this,
+            type: "number",
+            max: 360,
+            min: 0,
+            update: function() {
+              this.value = Math.round(this.color.hue);
+            },
+            _listeners: {
+              input: function() {
+                if (+this.value < 0) { this.value = 0; }
+                if (+this.value > 360) { this.value = 360; }
+                this.color.hue = +this.value;
+              },
+              keypress: function(event) {
+                if (!event.key.match(/\d/i)) {
+                  event.preventDefault();
+                }
+              }
+            }
+          }),
+          saturation = create_element("input", {
+            placeholder: options.saturation_placeholder || Math.floor(Math.random() * 100),
+            value: Math.round(this.saturation * 100),
+            className: options.class || "",
+            color: this,
+            type: "number",
+            max: 100,
+            min: 0,
+            update: function() {
+              this.value = Math.round(this.color.saturation * 100);
+            },
+            _listeners: {
+              input: function() {
+                if (+this.value < 0) { this.value = 0; }
+                if (+this.value > 100) { this.value = 100; }
+                this.color.saturation = this.value / 100;
+              },
+              keypress: function(event) {
+                if (!event.key.match(/\d/i)) {
+                  event.preventDefault();
+                }
+              }
+            }
+          }),
+          lightness = create_element("input", {
+            placeholder: options.lightness_placeholder || Math.floor(Math.random() * 256),
+            value: Math.round(this.lightness * 100),
+            className: options.class || "",
+            color: this,
+            type: "number",
+            max: 100,
+            min: 0,
+            update: function() {
+              this.value = Math.round(this.color.lightness * 100);
+            },
+            _listeners: {
+              input: function() {
+                if (+this.value < 0) { this.value = 0; }
+                if (+this.value > 100) { this.value = 100; }
+                this.color.lightness = this.value / 100;
+              },
+              keypress: function(event) {
+                if (!event.key.match(/\d/i)) {
+                  event.preventDefault();
+                }
+              }
+            }
+          });
+
+      if (options.keypress) {
+        hue.addEventListener("keypress", options.keypress);
+        lightness.addEventListener("keypress", options.keypress);
+        saturation.addEventListener("keypress", options.keypress);
+      }
+
+      color.update_list.push(hue, saturation, lightness);
+      setTimeout(() => {
+        hue = null;
+        saturation = null;
+        lightness = null;
+      }, 0);
+      return [hue, saturation, lightness];
+    };
     color.create_alpha_input = function(options = {}) {
       let input = create_element("input", {
             placeholder: options.placeholder || Math.floor(Math.random() * 256),
@@ -166,7 +249,6 @@ const Color = function(color_) {
             type: "number",
             max: 255,
             min: 0,
-            alpha: true,
             update: function() {
               this.value = this.color.alpha;
             },
@@ -207,7 +289,7 @@ const Color = function(color_) {
             target.cssrgb = Color.cssrgb(target);
 
             for (let i = 0; i < target.update_list.length; i++) {
-              if (!target.update_list[i].alpha) {
+              if (!target.update_list[i] != document.activeElement) {
                 target.update_list[i].update();
               }
             }
@@ -229,7 +311,7 @@ const Color = function(color_) {
             hsl = null;
 
             for (let i = 0; i < target.update_list.length; i++) {
-              if (!target.update_list[i].rgb) {
+              if (!target.update_list[i] != document.activeElement) {
                 target.update_list[i].update();
               }
             }
@@ -251,7 +333,7 @@ const Color = function(color_) {
             target.brightness = Color.brightness(target);
 
             for (let i = 0; i < target.update_list.length; i++) {
-              if (!target.update_list[i].hsl) {
+              if (!target.update_list[i] != document.activeElement) {
                 target.update_list[i].update();
               }
             }
@@ -300,7 +382,7 @@ const Color = function(color_) {
               target.hex = Color.hex(target);
 
               for (let i = 0; i < target.update_list.length; i++) {
-                if (!target.update_list[i].hex) {
+                if (target.update_list[i] != document.activeElement) {
                   target.update_list[i].update();
                 }
               }

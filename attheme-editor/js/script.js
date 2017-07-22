@@ -64,16 +64,29 @@ const header = document.querySelector("header"),
                 }),
                 file_input = create_element("input", {
                   type: "file",
+                  accept: ".attheme,.attheme-editor",
                   _listeners: {
                     change: function() {
-                      if (this.files[0].name.slice(-8) == ".attheme"){
+                      if (this.files[0].name.slice(-8) == ".attheme") {
                         let reader = new FileReader();
                         reader.onload = function() {
                           load_theme(reader.result);
                           set_workplace("workplace");
                         };
-                        reader.readAsText(this.files[0]);
+                        reader.readAsText(this.files[0], "ANSI");
                         localStorage.theme_name = this.files[0].name.replace(".attheme", "");
+                      } else if (this.files[0].name.slice(-15) == ".attheme-editor") {
+                        let reader = new FileReader();
+                        reader.onload = function() {
+                          let data = JSON.parse(reader.result);
+                          theme = data.theme;
+                          theme_palette = data.palette;
+                          localStorage.theme_name = data.name;
+                          localStorage.theme = JSON.stringify(theme);
+                          localStorage.palette = JSON.stringify(theme_palette);
+                          set_workplace("workplace");
+                        };
+                        reader.readAsText(this.files[0], "ansi");
                       } else {
                         show_dialog("incorrect-file");
                       }
@@ -173,6 +186,7 @@ const header = document.querySelector("header"),
                       if (localStorage.image) {
                         file_content += "WPS\n" + localStorage.image;
                       }
+
                       let file = create_element("a", {
                         href: "data:text/plain;charset=ansi," + encodeURIComponent(file_content),
                         download: localStorage.theme_name + ".attheme"
@@ -180,6 +194,32 @@ const header = document.querySelector("header"),
                       document.body.appendChild(file);
                       file.click();
                       file.remove();
+
+                      file = null;
+                      file_content = null;
+                    }
+                  }
+                }),
+                download_for_editing_button = create_element("button", {
+                  className: "workplace_button",
+                  type: "button",
+                  innerHTML: "Download for further editing",
+                  title: "Download the theme editing file with saving all parameters for further editing but openable only in the editor",
+                  _listeners: {
+                    click: function() {
+                      let file_content = JSON.stringify({
+                            name: localStorage.theme_name,
+                            theme: theme,
+                            palette: theme_palette
+                          }),
+                          file = create_element("a", {
+                            href: "data:text/plain," + encodeURIComponent(file_content),
+                            download: localStorage.theme_name + ".attheme-editor"
+                          });
+                      document.body.appendChild(file);
+                      file.click();
+                      file.remove();
+
                       file = null;
                       file_content = null;
                     }
@@ -196,10 +236,10 @@ const header = document.querySelector("header"),
                     }
                   }
                 }),
-                add_varaible_container = create_element("div", {
+                add_variable_container = create_element("div", {
                   className: "workplace_add-variable-container"
                 }),
-                add_varaible_input = create_element("input", {
+                add_variable_input = create_element("input", {
                   className: "workplace_add-variable_input",
                   placeholder: "Find or add a variable...",
                   _listeners: {
@@ -213,7 +253,7 @@ const header = document.querySelector("header"),
                     }
                   }
                 }),
-                add_varaible_suggestions = create_element("ul", {
+                add_variable_suggestions = create_element("ul", {
                   className: "workplace_add-variable_suggestions"
                 }),
                 variable_list = create_element("ul", {
@@ -222,12 +262,12 @@ const header = document.querySelector("header"),
                 amount = 0;
 
             addEventListener("scroll", function() {
-              if (window.scrollY >= 261) {
-                if (!(add_varaible_container.className.indexOf(" fixed") + 1)) {
-                  add_varaible_container.className += " fixed";
+              if (window.scrollY >= add_variable_input.top) {
+                if (!(add_variable_container.className.indexOf(" fixed") + 1)) {
+                  add_variable_container.className += " fixed";
                 }
               } else {
-                add_varaible_container.className = add_varaible_container.className.replace(" fixed", "");
+                add_variable_container.className = add_variable_container.className.replace(" fixed", "");
               }
             }, {
               passive: true
@@ -275,27 +315,29 @@ const header = document.querySelector("header"),
               warning_text = null;
             }
             buttons.appendChild(close_button);
-            add_varaible_container.appendChild(add_varaible_input);
-            add_varaible_container.appendChild(add_varaible_suggestions);
+            buttons.appendChild(download_for_editing_button);
+            add_variable_container.appendChild(add_variable_input);
+            add_variable_container.appendChild(add_variable_suggestions);
             workplace.appendChild(theme_name);
             workplace.appendChild(buttons);
             workplace.appendChild(download_button);
-            workplace.appendChild(add_varaible_container);
+            workplace.appendChild(add_variable_container);
             workplace.appendChild(variable_list);
             workplace.appendChild(variables_amount);
 
+            add_variable_input.top = add_variable_input.offsetTop;
             action_button = download_button;
 
             addEventListener("keydown", function(event) {
               if (event.ctrlKey && !event.shiftKey && !event.altKey && event.code == "KeyF") {
                 event.preventDefault();
-                scrollTo(0, add_varaible_input.getBoundingClientRect().top + document.body.scrollTop);
-                add_varaible_input.focus();
+                scrollTo(0, add_variable_input.getBoundingClientRect().top + document.body.scrollTop);
+                add_variable_input.focus();
               }
             });
 
             elements.theme_name = theme_name;
-            elements.suggestions = add_varaible_suggestions;
+            elements.suggestions = add_variable_suggestions;
             elements.variable_list = variable_list;
         }
       },
@@ -417,9 +459,20 @@ const header = document.querySelector("header"),
           title.className += " monospace";
           dialog.color = Color(theme[editing]);
           let rgb_inputs = dialog.color.create_rgb_inputs({
-                red_placeholder: theme[editing].red,
-                green_placeholder: theme[editing].green,
-                blue_placeholder: theme[editing].blue,
+                red_placeholder: dialog.color.red,
+                green_placeholder: dialog.color.green,
+                blue_placeholder: dialog.color.blue,
+                class: "window_input",
+                keypress: function() {
+                  if (event.key == "Enter") {
+                    this.parentElement.nextSibling.childNodes[1].focus();
+                  }
+                }
+              }),
+              hsl_inputs = dialog.color.create_hsl_inputs({
+                hue_placeholder: Math.round(dialog.color.hue),
+                saturation_placeholder: Math.round(dialog.color.saturation * 100),
+                lightness_placeholder: Math.round(dialog.color.lightness * 100),
                 class: "window_input",
                 keypress: function() {
                   if (event.key == "Enter") {
@@ -428,7 +481,6 @@ const header = document.querySelector("header"),
                 }
               }),
               hex_input = dialog.color.create_hex_input({
-                id: "hex",
                 class: "window_input",
                 keypress: function(event) {
                   if (event.key == "Enter") {
@@ -436,8 +488,7 @@ const header = document.querySelector("header"),
                   }
                 }
               }),
-              hex_input_label = create_element("label", {
-                for: "hex",
+              hex_label = create_element("label", {
                 className: "window_label",
                 innerHTML: "HEX value"
               }),
@@ -453,16 +504,37 @@ const header = document.querySelector("header"),
                 className: "window_label",
                 innerHTML: "Blue"
               }),
-              alpha_label = create_element("label", {
+              hue_label = create_element("label", {
                 className: "window_label",
+                innerHTML: "Hue"
+              }),
+              saturation_label = create_element("label", {
+                className: "window_label",
+                innerHTML: "Saturation"
+              }),
+              lightness_label = create_element("label", {
+                className: "window_label",
+                innerHTML: "Lightness"
+              }),
+              alpha_label = create_element("label", {
+                className: "window_label alpha",
                 innerHTML: "Alpha"
               }),
               rgba = create_element("div", {
                 className: "window_fieldset"
               }),
+              hsl_container = create_element("div", {
+                className: "window_fieldset"
+              }),
+              hex_container = create_element("div", {
+                className: "window_fieldset"
+              }),
               red = rgb_inputs[0],
               green = rgb_inputs[1],
               blue = rgb_inputs[2],
+              hue = hsl_inputs[0],
+              saturation = hsl_inputs[1],
+              lightness = hsl_inputs[2],
               alpha = dialog.color.create_alpha_input({
                 placeholder: theme[editing].alpha,
                 class: "window_input",
@@ -471,6 +543,9 @@ const header = document.querySelector("header"),
                     dialog.ok.click();
                   }
                 }
+              }),
+              inputs_container = create_element("div", {
+                className: "window_tab"
               }),
               color_container = create_element("div", {
                 className: "window_color-container"
@@ -491,15 +566,44 @@ const header = document.querySelector("header"),
                 value: "#" + b16(theme[editing].red) + b16(theme[editing].green) + b16(theme[editing].blue),
                 _listeners: {
                   change: function() {
-                    red.value = b10(this.value.slice(1, 3));
-                    green.value = b10(this.value.slice(3, 5));
-                    blue.value = b10(this.value.slice(5, 7));
-                    change_value();
+                    dialog.color.hex = this.value;
                   }
                 }
               }),
               palette_container = create_element("div", {
-                className: "window_palette"
+                className: "window_palette window_tab"
+              }),
+              tabs_container = create_element("div", {
+                className: "window_tab-container"
+              }),
+              tab_switches = create_element("div", {
+                className: "window_tab-switches"
+              }),
+              tab_inputs = create_element("button", {
+                className: "window_tab-switch inputs active",
+                innerHTML: "Value",
+                _listeners: {
+                  click: function() {
+                    remove_class(tabs_container, "palette");
+                    add_class(tabs_container, "inputs");
+                    add_class(this, "active");
+                    remove_class(tab_palette, "active");
+                    this.blur();
+                  }
+                }
+              }),
+              tab_palette = create_element("button", {
+                className: "window_tab-switch palette",
+                innerHTML: "Palette",
+                _listeners: {
+                  click: function() {
+                    remove_class(tabs_container, "inputs");
+                    add_class(tabs_container, "palette");
+                    add_class(this, "active");
+                    remove_class(tab_inputs, "active");
+                    this.blur();
+                  }
+                }
               });
 
           dialog.color.update_list.push(color);
@@ -520,10 +624,10 @@ const header = document.querySelector("header"),
 
           color.style.background = Color.cssrgb(theme[editing]);
 
-          dialog.red = red;
-          dialog.green = green;
-          dialog.blue = blue;
-          dialog.alpha = alpha;
+          // dialog.red = red;
+          // dialog.green = green;
+          // dialog.blue = blue;
+          // dialog.alpha = alpha;
           dialog.hex = hex_input;
           ok.addEventListener("click", function() {
             let old_color = {
@@ -644,21 +748,41 @@ const header = document.querySelector("header"),
           }
 
           content_container.appendChild(color_input);
-          content_container.appendChild(hex_input_label);
-          content_container.appendChild(hex_input);
-          content_container.appendChild(rgba);
-          content_container.appendChild(palette_container);
+          content_container.appendChild(tab_switches);
+          content_container.appendChild(tabs_container);
+
+          tab_switches.appendChild(tab_inputs);
+          tab_switches.appendChild(tab_palette);
+
+          tabs_container.appendChild(inputs_container);
+          tabs_container.appendChild(palette_container);
+
+          inputs_container.appendChild(hex_container);
+          inputs_container.appendChild(rgba);
+          inputs_container.appendChild(hsl_container);
 
           color_container.appendChild(color);
           rgba.appendChild(red_label);
           rgba.appendChild(green_label);
           rgba.appendChild(blue_label);
-          rgba.appendChild(alpha_label);
+
+          hsl_container.appendChild(hue_label);
+          hsl_container.appendChild(saturation_label);
+          hsl_container.appendChild(lightness_label);
+
+          hex_container.appendChild(hex_label);
+          hex_container.appendChild(alpha_label);
 
           red_label.appendChild(red);
           green_label.appendChild(green);
           blue_label.appendChild(blue);
+
+          hex_label.appendChild(hex_input);
           alpha_label.appendChild(alpha);
+
+          hue_label.appendChild(hue);
+          lightness_label.appendChild(lightness);
+          saturation_label.appendChild(saturation);
 
           dialog.color_preview = color;
           dialog.color_input = color_input;
@@ -666,7 +790,7 @@ const header = document.querySelector("header"),
 
           container.className += " full-width";
         } else if (type == "incorrect-file") {
-          title.innerHTML = "You selected a file with an incorrect extension (it should be .attheme)";
+          title.innerHTML = "You selected a file with an incorrect extension (it should be .attheme or .attheme-editor)";
           ok.innerHTML = "Got it";
           ok.addEventListener("click", function() {
             dialog.container.click();
@@ -680,10 +804,12 @@ const header = document.querySelector("header"),
         }
 
         dialog.content_container = content_container;
-        if (screen.width / devicePixelRatio < 500) {
+
+        if (screen.width / devicePixelRatio < 512) {
           dialog.content_container.style.maxHeight = innerHeight - 52 + "px";
           dialog.parentElement.style.paddingBottom = screen.availHeight - innerHeight + "px";
         }
+        dialog.container = container;
         dialog.appendChild(content_container);
         dialog.appendChild(buttons_container);
         dialog.ok = ok;
@@ -692,6 +818,12 @@ const header = document.querySelector("header"),
           buttons_container.appendChild(cancel);
         }
         document.body.appendChild(container);
+        document.body.className += " no-overflow";
+        document.body.style.paddingRight = scrollbar_width + "px";
+        header.className += " full-width";
+        header.style.paddingRight = scrollbar_width + "px";
+        action_button.style.right = `${24 + scrollbar_width}px`;
+
         if (type == "variable-edit") {
           dialog.hex.focus();
           if (dialog.palette.offsetWidth == dialog.palette.clientWidth) {
@@ -700,11 +832,6 @@ const header = document.querySelector("header"),
         } else {
           dialog.ok.focus();
         }
-        document.body.className += " no-overflow";
-        document.body.style.paddingRight = scrollbar_width + "px";
-        header.className += " full-width";
-        header.style.paddingRight = scrollbar_width + "px";
-        action_button.style.right = `${24 + scrollbar_width}px`;
 
         history.pushState(null, document.title, location.href + "#");
         history.onpushstate = close_dialog;
@@ -956,10 +1083,26 @@ document.addEventListener("drop", function(event) {
       reader.onload = function() {
         load_theme(reader.result);
         set_workplace("workplace");
+        console.log(reader.result);
       };
       reader.readAsText(event.dataTransfer.files[i]);
       localStorage.theme_name = event.dataTransfer.files[i].name.replace(".attheme", "");
 
+      return;
+    } else if (event.dataTransfer.files[i].name.slice(-15) == ".attheme-editor") {
+      image = false;
+      theme = {};
+      let reader = new FileReader();
+      reader.onload = function() {
+        let data = JSON.parse(reader.result);
+        theme = data.theme;
+        theme_palette = data.palette;
+        localStorage.theme_name = data.name;
+        localStorage.theme = JSON.stringify(theme);
+        localStorage.palette = JSON.stringify(theme_palette);
+        set_workplace("workplace");
+      };
+      reader.readAsText(event.dataTransfer.files[i], "ANSI");
       return;
     }
   }

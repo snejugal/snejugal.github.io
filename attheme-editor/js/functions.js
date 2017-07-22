@@ -141,4 +141,21 @@ const get_preview = function(variable) {
             }
           }
         }
+      },
+      add_class = function(element, class_to_add) {
+        let classes = element.className.split(" ");
+        
+        if (!~classes.indexOf(class_to_add)) {
+          classes.push(class_to_add);
+        }
+        element.className = classes.join(" ");
+      },
+      remove_class = function(element, class_to_remove) {
+        let classes = element.className.split(" ");
+
+        while(~classes.indexOf(class_to_remove)) {
+          let index = classes.indexOf(class_to_remove);
+          classes.splice(index, 1);
+        }
+        element.className = classes.join(" ");
       };

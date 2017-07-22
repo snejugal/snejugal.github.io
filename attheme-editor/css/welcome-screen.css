@@ -1,0 +1,82 @@
+.welcome_buttons {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.welcome_title {
+  margin: 0 0 48px;
+  font-size: 45px;
+  font-weight: 400;
+}
+
+.welcome_button,
+.workplace_button {
+  font-size: 20px;
+  display: block;
+  padding: 8px 18px 12px;
+  font-family: inherit;
+  background-color: #2196f3;
+  color: #fff;
+  position: relative;
+  transition: box-shadow .3s;
+  will-change: box-shadow;
+  border-radius: 2px;
+  border: none;
+  margin: 0 0 24px;
+  box-shadow: 0 2px 2px rgba(0, 0, 0, .1);
+}
+
+.welcome_button::after,
+.workplace_button::after {
+  content: "";
+  background: #000;
+  border-radius: 2px;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  will-change: opacity;
+  transition: opacity .3s;
+  position: absolute;
+}
+
+.welcome_button:hover::after,
+.workplace_button:hover::after,
+.welcome_button:focus::after,
+.workplace_button:focus::after {
+  opacity: .1;
+}
+
+.welcome_button:active::after,
+.workplace_button:active::after {
+  opacity: .2;
+}
+
+.welcome_button:hover,
+.welcome_button:focus,
+.workplace_button:hover,
+.workplace_button:focus {
+  box-shadow: 0 4px 4px rgba(0, 0, 0, .1);
+}
+
+.welcome_button:focus,
+.workplace_button:focus {
+  box-shadow: 0 0 0 2px #82B1FF !important;
+}
+
+.welcome_button:active,
+.workplace_button:active {
+  box-shadow: 0 1px 1px rgba(0, 0, 0, .1);
+}
+
+.welcome_drop-hint {
+  font-size: 34px;
+  margin: 24px 0 0;
+  color: #bdbdbd;
+}
+
+.welcome input {
+  display: none;
+}
