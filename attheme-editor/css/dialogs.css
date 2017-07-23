@@ -373,7 +373,8 @@
 }
 
 .window_palette.right-margin {
-  margin-right: -8px;
+  width: calc(100% + 8px);
+  max-width: calc(100% + 8px);
 }
 
 .window_palette_color {

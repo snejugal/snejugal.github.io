@@ -171,6 +171,24 @@ noscript {
   box-sizing: border-box;
 }
 
+.snackbar-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  animation: snackbar-appearing 5.6s both;
+  z-index: 4;
+}
+
+.snackbar {
+  max-width: 568px;
+  min-width: 288px;
+  margin: auto;
+  background: #323232;
+  color: #fff;
+  padding: 24px;
+}
+
 @keyframes loading {
   0% {
     transform: rotate(0turn);
@@ -178,5 +196,15 @@ noscript {
 
   100% {
     transform: rotate(1turn);
+  }
+}
+
+@keyframes snackbar-appearing {
+  0%, 100% {
+    transform: translateY(100%);
+  }
+
+  5.36%, 94.64% {
+    transform: translateY(0%);
   }
 }

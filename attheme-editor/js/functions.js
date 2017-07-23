@@ -3,51 +3,36 @@
 const get_preview = function(variable) {
         return new Promise(function(resolve, reject) {
           if (previews[variable]) {
-            let request = fetch(`variables-previews/${previews[variable]}.svg`).then(function(response) {
-              if (response.ok) {
-                response.text().then(function(text) {
-                  let svg = new DOMParser().parseFromString(text, "text/xml"),
-                      tree = svg.querySelector("svg"),
-                      changable_elements = svg.querySelectorAll("*[class]");
+            let request = fetch(`variables-previews/${previews[variable]}.svg`)
+                  .then((response) => {
+                    if (response.ok) {
+                      return response.text()
+                    }
+                    reject("Couldn't fetch");
+                  })
+                  .then(function(text) {
+                    let svg = new DOMParser().parseFromString(text, "text/xml"),
+                        tree = svg.querySelector("svg"),
+                        changableElements = svg.querySelectorAll("*[class]");
 
-                  for (let i = 0; i < changable_elements.length; i++) {
-                    let variable = changable_elements[i].className.baseVal;
-                    changable_elements[i].style.fill = Color.cssrgb(defaults[variable]);
-                  }
-
-                  resolve({
-                    color: function(colors) {
-                      for (let i in colors) {
-                        let elements = this.tree.querySelectorAll(`.${i}`),
-                            color;
-
-                        if (typeof(colors[i]) == "string") {
-                          color = colors[i];
-                        } else if (typeof(colors[i]) == "object") {
-                          color = Color.cssrgb(colors[i]);
-                        } else {
-                          continue;
-                        }
-
-                        for (let k = 0; k < elements.length; k++) {
-                          elements[k].style.fill = color;
-                        }
+                    for (let i = 0; i < changableElements.length; i++) {
+                      let variable = changableElements[i].className.baseVal;
+                      if (theme[variable]) {
+                        changableElements[i].style.fill = Color.cssrgb(theme[variable]);
+                      } else {
+                        changableElements[i].style.fill = Color.cssrgb(defaults[variable]);
                       }
-                    },
-                    tree: tree,
-                    customizable_elements: changable_elements
+                      variable = null;
+                    }
+
+                    resolve({
+                      tree: tree
+                    })
+                  }).catch(function() {
+                    reject("Couldn't fetch");
                   });
-                })
-              } else {
-                reject({
-                  error: "Error while loading"
-                })
-              }
-            })
           } else {
-            reject({
-              error: "No preview exists"
-            });
+            reject("Preview doesn't exist");
           }
         });
       },
@@ -70,7 +55,10 @@ const get_preview = function(variable) {
       },
       b16 = function(number) {
         number = number.toString(16);
-        return new Array(3 - number.length).join("0") + number;
+        if (number.length == 1) {
+          number = "0" + number;
+        }
+        return number;
       },
       b10 = function(number) {
         return parseInt(number, 16);
@@ -142,20 +130,37 @@ const get_preview = function(variable) {
           }
         }
       },
-      add_class = function(element, class_to_add) {
+      add_class = function(element, classToAdd) {
         let classes = element.className.split(" ");
-        
-        if (!~classes.indexOf(class_to_add)) {
-          classes.push(class_to_add);
+
+        if (!~classes.indexOf(classToAdd)) {
+          classes.push(classToAdd);
         }
         element.className = classes.join(" ");
       },
-      remove_class = function(element, class_to_remove) {
+      remove_class = function(element, classToRemove) {
         let classes = element.className.split(" ");
 
-        while(~classes.indexOf(class_to_remove)) {
-          let index = classes.indexOf(class_to_remove);
+        while(~classes.indexOf(classToRemove)) {
+          let index = classes.indexOf(classToRemove);
           classes.splice(index, 1);
         }
         element.className = classes.join(" ");
+      },
+      showSnackbar = function(text) {
+        let snackbarContainer = create_element("div", {
+              className: "snackbar-container",
+              _listeners: {
+                animationend() {
+                  this.remove();
+                }
+              }
+            }),
+            snackbar = create_element("div", {
+              className: "snackbar",
+              innerHTML: text
+            });
+
+            snackbarContainer.appendChild(snackbar);
+            document.body.appendChild(snackbarContainer);
       };

@@ -171,7 +171,7 @@ const Color = function(color_) {
                 this.color.hue = +this.value;
               },
               keypress: function(event) {
-                if (!event.key.match(/\d/i)) {
+                if (!event.key.match(/[\d.,]/i)) {
                   event.preventDefault();
                 }
               }
@@ -195,7 +195,7 @@ const Color = function(color_) {
                 this.color.saturation = this.value / 100;
               },
               keypress: function(event) {
-                if (!event.key.match(/\d/i)) {
+                if (!event.key.match(/[\d.,]/i)) {
                   event.preventDefault();
                 }
               }
@@ -219,7 +219,7 @@ const Color = function(color_) {
                 this.color.lightness = this.value / 100;
               },
               keypress: function(event) {
-                if (!event.key.match(/\d/i)) {
+                if (!event.key.match(/[\d.,]/i)) {
                   event.preventDefault();
                 }
               }
@@ -259,7 +259,7 @@ const Color = function(color_) {
                 this.color.alpha = +this.value;
               },
               keypress: function(event) {
-                if (!event.key.match(/\d/i)) {
+                if (!event.key.match(/[\d.]/i)) {
                   event.preventDefault();
                 }
               }
@@ -431,6 +431,17 @@ Color.brightness = function(color) {
       color.blue !== undefined) {
 
     return .2126 * (color.red / 255) + .7152 * (color.green / 255) + .0722 * (color.blue / 255);
+  } else if (typeof color == "string") {
+    if (color[0] == "#") {
+      switch(color.length) {
+        case 7:
+          return Color.brightness({
+            red: b10(color.slice(1, 3)),
+            green: b10(color.slice(3, 5)),
+            blue: b10(color.slice(5, 7))
+          });
+      }
+    }
   }
 };
 

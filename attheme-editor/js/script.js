@@ -580,7 +580,7 @@ const header = document.querySelector("header"),
                 className: "window_tab-switches"
               }),
               tab_inputs = create_element("button", {
-                className: "window_tab-switch inputs active",
+                className: "window_tab-switch inputs",
                 innerHTML: "Value",
                 _listeners: {
                   click: function() {
@@ -588,6 +588,7 @@ const header = document.querySelector("header"),
                     add_class(tabs_container, "inputs");
                     add_class(this, "active");
                     remove_class(tab_palette, "active");
+                    localStorage.last_tab = "value";
                     this.blur();
                   }
                 }
@@ -601,10 +602,18 @@ const header = document.querySelector("header"),
                     add_class(tabs_container, "palette");
                     add_class(this, "active");
                     remove_class(tab_inputs, "active");
+                    localStorage.last_tab = "palette";
                     this.blur();
                   }
                 }
               });
+
+          if (localStorage.last_tab == "palette") {
+            add_class(tab_palette, "active");
+            add_class(tabs_container, "palette");
+          } else {
+            add_class(tab_inputs, "active");
+          }
 
           dialog.color.update_list.push(color);
 
@@ -612,22 +621,23 @@ const header = document.querySelector("header"),
 
           get_preview(editing).then(function(response) {
             let editing_element = response.tree.querySelector(`.${editing}`);
+
+            dialog.color.update_list.pop();
+            dialog.color.update_list.push(editing_element);
+            color_container.replaceWith(response.tree);
+            response.tree.setAttribute("class", "window_preview");
+
             editing_element.update = function() {
               this.style.fill = dialog.color.cssrgb;
+            };
+          }).catch(function(error) {
+            if (error == "Couldn't fetch") {
+              showSnackbar("Couldn't load the variable preview. Make sure whether you have internet connection");
             }
-            dialog.color.update_list[dialog.color.update_list.length - 1] = editing_element;
-            content_container.insertBefore(response.tree, color_container);
-            response.tree.setAttribute("class", "window_preview");
-            color_container.remove();
-            response.color(theme);
-          }).catch(function(){});
+          });
 
           color.style.background = Color.cssrgb(theme[editing]);
 
-          // dialog.red = red;
-          // dialog.green = green;
-          // dialog.blue = blue;
-          // dialog.alpha = alpha;
           dialog.hex = hex_input;
           ok.addEventListener("click", function() {
             let old_color = {
@@ -729,17 +739,12 @@ const header = document.querySelector("header"),
                       dialog.color.hex = this.dataset.color;
                       dialog.color.alpha = alpha;
                       dialog.hex.value = dialog.color.hex;
-                      dialog.alpha.value = alpha;
                       alpha = null;
                     }
                   }
                 })) - 1;
 
-            if (Color.brightness({
-                  red: b10(theme_palette[k].slice(1, 3)),
-                  green: b10(theme_palette[k].slice(3, 5)),
-                  blue: b10(theme_palette[k].slice(5, 7))
-                }) > .75) {
+            if (Color.brightness(theme_palette[k]) > .75) {
               palette_colors[n].className += " dark-color";
             }
             palette_colors[n].style.background = palette_colors[n].dataset.color;
@@ -825,7 +830,9 @@ const header = document.querySelector("header"),
         action_button.style.right = `${24 + scrollbar_width}px`;
 
         if (type == "variable-edit") {
-          dialog.hex.focus();
+          if (localStorage.last_tab == "value") {
+            dialog.hex.focus();
+          }
           if (dialog.palette.offsetWidth == dialog.palette.clientWidth) {
             dialog.palette.className += " right-margin";
           }
@@ -1083,7 +1090,6 @@ document.addEventListener("drop", function(event) {
       reader.onload = function() {
         load_theme(reader.result);
         set_workplace("workplace");
-        console.log(reader.result);
       };
       reader.readAsText(event.dataTransfer.files[i]);
       localStorage.theme_name = event.dataTransfer.files[i].name.replace(".attheme", "");

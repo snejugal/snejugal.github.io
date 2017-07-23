@@ -6,7 +6,10 @@ self.addEventListener("install", function(event) {
       "js/values.js",
       "js/script.js",
       "js/functions.js",
-      "css/style.css",
+      "css/general.css",
+      "css/welcome-screen.css",
+      "css/workplace-screen.css",
+      "css/dialogs.css",
       "img/transparency.svg",
       "img/dark-transparency.svg",
       "img/favicon.png",
@@ -21,13 +24,15 @@ self.addEventListener("install", function(event) {
 });
 
 async function recache(request) {
-  setTimeout(function() {
-    caches.open("attheme-editor").then(function(cache) {
-      cache.delete(request).then(function() {
-        cache.add(request.url);
+  if (request.url.slice(0, 4) == "http") {
+    setTimeout(function() {
+      caches.open("attheme-editor").then(function(cache) {
+        cache.delete(request).then(function() {
+          cache.add(request.url);
+        });
       });
-    });
-  }, 1000);
+    }, 1000);
+  }
 }
 
 self.addEventListener("activate", function(event) {
@@ -36,13 +41,13 @@ self.addEventListener("activate", function(event) {
 
 self.addEventListener("fetch", function(event) {
   event.respondWith(caches.match(event.request).then(function(response) {
-
-    if (event.request.url.indexOf("/variables-previews/") == -1 && "onLine" in navigator && navigator.onLine) {
-      if (event.request.url.slice(0, 4) == "http") {
-        recache(event.request);
+    if (navigator.onLine) {
+      recache(event.request);
+      if (event.request.url.match(/\/variables-previews\//)) {
+        return response;
       }
       return fetch(event.request) || response;
     }
-    return response || fetch(event.request);
+    return response;
   }));
 });
