@@ -44,7 +44,7 @@ self.addEventListener("fetch", function(event) {
     if (navigator.onLine) {
       recache(event.request);
       if (event.request.url.match(/\/variables-previews\//)) {
-        return response;
+        return response || fetch(event.request);
       }
       return fetch(event.request) || response;
     }

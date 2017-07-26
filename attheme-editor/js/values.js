@@ -2,6 +2,7 @@
   actionBarDefault: "actionBarDefault",
   actionBarDefaultIcon: "actionBarDefault",
   actionBarDefaultTitle: "actionBarDefault",
+  actionBarWhiteSelector: "actionBarWhiteSelector",
   avatar_backgroundRed: "actionBarDefault",
   avatar_text: "actionBarDefault",
   chats_date: "actionBarDefault",
@@ -21,5 +22,7 @@
   player_progressBackground: "player_seekBar",
   player_seekBarBackground: "player_seekBar",
   player_time: "player_seekBar",
-  windowBackgroundWhite: "actionBarDefault"
+  windowBackgroundWhite: "actionBarDefault",
+  windowBackgroundWhiteBlueText5: "windowBackgroundWhiteBlueText5",
+  windowBackgroundWhiteGrayText2: "windowBackgroundWhiteBlueText5"
 };Object.freeze(default_variables);for(let i in defaults){Object.freeze(defaults[i])};Object.freeze(defaults);Object.freeze(previews);
