@@ -372,6 +372,15 @@
   max-width: 100%;
 }
 
+.window_palette:not(:empty)::after {
+  content: "Click a color twice to remove it";
+  display: block;
+  opacity: .5;
+  margin-top: 12px;
+  width: 100%;
+  flex-shrink: 0;
+}
+
 .window_palette.right-margin {
   width: calc(100% + 8px);
   max-width: calc(100% + 8px);

@@ -23,9 +23,9 @@ const Color = function(color_) {
 
     color.create_hex_input = function(options = {}) {
       let input = create_element("input", {
-            placeholder: options.placeholder || "#aarrggbb",
+            placeholder: "#aarrggbb",
             value: this.hex || "",
-            className: options.class || "",
+            className: "window_input",
             type: "text",
             color: this,
             update: function() {
@@ -49,13 +49,13 @@ const Color = function(color_) {
                 if (this.value.length > 8 || !event.key.match(/[#a-f0-9]/i)) {
                   event.preventDefault();
                 }
+
+                if (event.key == "Enter") {
+                  dialog.ok.click();
+                }
               }
             }
           });
-
-      if (options.keypress) {
-        input.addEventListener("keypress", options.keypress);
-      }
 
       color.update_list.push(input);
       setTimeout(() => {
@@ -66,9 +66,9 @@ const Color = function(color_) {
 
     color.create_rgb_inputs = function(options = {}) {
       let red = create_element("input", {
-            placeholder: options.red_placeholder || Math.floor(Math.random() * 256),
+            placeholder: this.red,
             value: this.red,
-            className: options.class || "",
+            className: "window_input",
             color: this,
             type: "number",
             max: 255,
@@ -86,13 +86,16 @@ const Color = function(color_) {
                 if (!event.key.match(/\d/i)) {
                   event.preventDefault();
                 }
+                if (event.key == "Enter") {
+                  this.parentElement.nextSibling.childNodes[1].focus();
+                }
               }
             }
           }),
           green = create_element("input", {
-            placeholder: options.green_placeholder || Math.floor(Math.random() * 256),
+            placeholder: this.green,
             value: this.green,
-            className: options.class || "",
+            className: "window_input",
             color: this,
             type: "number",
             max: 255,
@@ -110,13 +113,16 @@ const Color = function(color_) {
                 if (!event.key.match(/\d/i)) {
                   event.preventDefault();
                 }
+                if (event.key == "Enter") {
+                  this.parentElement.nextSibling.childNodes[1].focus();
+                }
               }
             }
           }),
           blue = create_element("input", {
-            placeholder: options.blue_placeholder || Math.floor(Math.random() * 256),
+            placeholder: this.blue,
             value: this.blue,
-            className: options.class || "",
+            className: "window_input",
             color: this,
             type: "number",
             max: 255,
@@ -134,15 +140,12 @@ const Color = function(color_) {
                 if (!event.key.match(/\d/i)) {
                   event.preventDefault();
                 }
+                if (event.key == "Enter") {
+                  dialog.ok.focus();
+                }
               }
             }
           });
-
-      if (options.keypress) {
-        red.addEventListener("keypress", options.keypress);
-        green.addEventListener("keypress", options.keypress);
-        blue.addEventListener("keypress", options.keypress);
-      }
 
       color.update_list.push(red, green, blue);
       setTimeout(() => {
@@ -154,9 +157,9 @@ const Color = function(color_) {
     };
     color.create_hsl_inputs = function(options = {}) {
       let hue = create_element("input", {
-            placeholder: options.hue_placeholder || Math.floor(Math.random() * 360),
+            placeholder: Math.round(this.hue),
             value: Math.round(this.hue),
-            className: options.class || "",
+            className: "window_input",
             color: this,
             type: "number",
             max: 360,
@@ -174,13 +177,16 @@ const Color = function(color_) {
                 if (!event.key.match(/[\d.,]/i)) {
                   event.preventDefault();
                 }
+                if (event.key == "Enter") {
+                  this.parentElement.nextSibling.childNodes[1].focus();
+                }
               }
             }
           }),
           saturation = create_element("input", {
-            placeholder: options.saturation_placeholder || Math.floor(Math.random() * 100),
+            placeholder: Math.round(this.saturation * 100),
             value: Math.round(this.saturation * 100),
-            className: options.class || "",
+            className: "window_input",
             color: this,
             type: "number",
             max: 100,
@@ -198,13 +204,16 @@ const Color = function(color_) {
                 if (!event.key.match(/[\d.,]/i)) {
                   event.preventDefault();
                 }
+                if (event.key == "Enter") {
+                  this.parentElement.nextSibling.childNodes[1].focus();
+                }
               }
             }
           }),
           lightness = create_element("input", {
-            placeholder: options.lightness_placeholder || Math.floor(Math.random() * 256),
+            placeholder: Math.round(this.lightness * 100),
             value: Math.round(this.lightness * 100),
-            className: options.class || "",
+            className: "window_input",
             color: this,
             type: "number",
             max: 100,
@@ -222,15 +231,12 @@ const Color = function(color_) {
                 if (!event.key.match(/[\d.,]/i)) {
                   event.preventDefault();
                 }
+                if (event.key == "Enter") {
+                  dialog.ok.focus();
+                }
               }
             }
           });
-
-      if (options.keypress) {
-        hue.addEventListener("keypress", options.keypress);
-        lightness.addEventListener("keypress", options.keypress);
-        saturation.addEventListener("keypress", options.keypress);
-      }
 
       color.update_list.push(hue, saturation, lightness);
       setTimeout(() => {
@@ -242,9 +248,9 @@ const Color = function(color_) {
     };
     color.create_alpha_input = function(options = {}) {
       let input = create_element("input", {
-            placeholder: options.placeholder || Math.floor(Math.random() * 256),
+            placeholder: this.alpha,
             value: this.alpha,
-            className: options.class || "",
+            className: "window_input",
             color: this,
             type: "number",
             max: 255,
@@ -262,13 +268,13 @@ const Color = function(color_) {
                 if (!event.key.match(/[\d.]/i)) {
                   event.preventDefault();
                 }
+                if (event.key == "Enter") {
+                  dialog.ok.click();
+                }
               }
             }
           });
 
-      if (options.keypress) {
-        input.addEventListener("keypress", options.keypress);
-      }
 
       color.update_list.push(input);
       setTimeout(() => {
@@ -421,6 +427,18 @@ Color.cssrgb = function(color) {
       alpha = null;
     }, 0);
     return `rgba(${color.red}, ${color.green}, ${color.blue}, ${alpha})`;
+  }
+
+  if (typeof color == "string" &&
+      color[0] == "#" &&
+      color.length == 7) {
+
+    return Color.cssrgb({
+      red: b10(color.slice(1, 3)),
+      green: b10(color.slice(3, 5)),
+      blue: b10(color.slice(5, 7)),
+      alpha: 255
+    })
   }
 };
 
@@ -595,7 +613,8 @@ Color.are_the_same = function(first_color, second_color) {
 
     if (first_color.red !== second_color.red ||
         first_color.green !== second_color.green ||
-        first_color.blue !== second_color.blue) {
+        first_color.blue !== second_color.blue ||
+        first_color.alpha !== second_color.alpha) {
       return false;
     }
     return true;

@@ -9,6 +9,7 @@
   chats_message: "actionBarDefault",
   chats_name: "actionBarDefault",
   chats_sentCheck: "actionBarDefault",
+  divider: "windowBackgroundWhiteBlueText6",
   player_actionBar: "player_actionBar",
   player_actionBarItems: "player_actionBar",
   player_actionBarTitle: "player_actionBar",
@@ -24,5 +25,6 @@
   player_time: "player_seekBar",
   windowBackgroundWhite: "actionBarDefault",
   windowBackgroundWhiteBlueText5: "windowBackgroundWhiteBlueText5",
+  windowBackgroundWhiteBlueText6: "windowBackgroundWhiteBlueText6",
   windowBackgroundWhiteGrayText2: "windowBackgroundWhiteBlueText5"
-};Object.freeze(default_variables);for(let i in defaults){Object.freeze(defaults[i])};Object.freeze(defaults);Object.freeze(previews);
+},LIGHT_THEME_COLOR={red:255,green:255,blue:255},DARK_THEME_COLOR={red:42,green:42,blue:42};Object.freeze(default_variables);for(let i in defaults){Object.freeze(defaults[i])};Object.freeze(defaults);Object.freeze(previews);

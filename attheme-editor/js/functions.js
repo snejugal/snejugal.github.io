@@ -36,6 +36,38 @@ const get_preview = function(variable) {
           }
         });
       },
+      createElement = function(name, attributes, listeners) {
+        let elementName, classes = "";
+        if (~name.indexOf(".")) {
+          classes = name.slice(name.indexOf(".") + 1).split(".").join(" ");
+          elementName = name.slice(0, name.indexOf("."));
+          if (!elementName) {
+            elementName = "div";
+          }
+        } else {
+          elementName = name;
+        }
+        let element = document.createElement(elementName);
+        element.className = classes;
+
+        if (attributes) {
+          if (typeof attributes == "object") {
+            for (let i in attributes) {
+              element[i] = attributes[i];
+            }
+          } else {
+            element.innerHTML = attributes;
+          }
+        }
+
+        if (listeners) {
+          for (let i in listeners) {
+            element.addEventListener(i, listeners[i]);
+          }
+        }
+        return element;
+      },
+      // to be removed soon
       create_element = function(name, options) {
         let element = document.createElement(name);
         for (let i in options) {
@@ -130,7 +162,7 @@ const get_preview = function(variable) {
           }
         }
       },
-      add_class = function(element, classToAdd) {
+      addClass = function(element, classToAdd) {
         let classes = element.className.split(" ");
 
         if (!~classes.indexOf(classToAdd)) {
@@ -138,7 +170,10 @@ const get_preview = function(variable) {
         }
         element.className = classes.join(" ");
       },
-      remove_class = function(element, classToRemove) {
+      add_class = function(element, classToAdd) {
+        addClass(element, classToAdd);
+      },
+      removeClass = function(element, classToRemove) {
         let classes = element.className.split(" ");
 
         while(~classes.indexOf(classToRemove)) {
@@ -147,7 +182,10 @@ const get_preview = function(variable) {
         }
         element.className = classes.join(" ");
       },
-      showSnackbar = function(text) {
+      remove_class = function(element, classToRemove) {
+        removeClass(element, classToRemove);
+      },
+      showSnackbar = function(text, timer) {
         let snackbarContainer = create_element("div", {
               className: "snackbar-container",
               _listeners: {

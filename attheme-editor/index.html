@@ -8,6 +8,24 @@
     <link href="manifest.json" rel="manifest">
     <link href="img/favicon.png" rel="shortcut icon">
     <base href="/attheme-editor/">
+    <style>
+      .error {
+        background: #F44336;
+        color: #fff;
+        position: fixed;
+        top: 24px;
+        left: 24px;
+        width: calc(100vw - 48px);
+        padding: 24px;
+        border-radius: 2px;
+        box-shadow: 0 12px 24px rgba(0, 0, 0, .2);
+        z-index: 5;
+      }
+
+      .error a {
+        color: #fff;
+      }
+    </style>
   </head>
   <body>
     <script async>
@@ -17,6 +35,17 @@
         sessionStorage.dark = true;
       } else {
         sessionStorage.removeItem("dark");
+      }
+
+      onerror = function(message, source, line, column) {
+        var container = document.createElement("div");
+        container.innerHTML = "Oops, an error occured. Please contact <a href='//t.me/snejugal'>@snejugal</a> on Telegram and send the following:<br><br>" + message + "<br>at " + source + " " + line + ":" + column + "<br><br>If this happened after loading, click the warning to dismiss it and continue using the editor.";
+        container.onclick = function() {
+          this.parentElement.removeChild(this);
+        }
+        container.className = "error";
+        document.body.appendChild(container);
+        return true;
       }
     </script>
     <header>
