@@ -203,6 +203,16 @@ const header = document.querySelector("header"),
                     file_content = null;
                   }
                 }),
+                CompareWithAnotherThemeButton = createElement("button.workplace_button.green", {
+                  type: "button",
+                  innerHTML: "Compare with another theme",
+                  title: "Go to Compare .attheme's tool with this theme as one of themes to compare"
+                }, {
+                  click() {
+                    localStorage.openEditorTheme = true;
+                    location.href = "/compare-atthemes/";
+                  }
+                }),
                 close_button = createElement("button.workplace_button.red", {
                   type: "button",
                   innerHTML: "Close theme",
@@ -272,7 +282,7 @@ const header = document.querySelector("header"),
               warning_close_path = null;
               warning_text = null;
             }
-            buttons.append(close_button, download_for_editing_button);
+            buttons.append(close_button, download_for_editing_button, CompareWithAnotherThemeButton);
             add_variable_container.append(add_variable_input, add_variable_suggestions);
             workplace.append(theme_name, buttons, download_button, add_variable_container, variable_list, variables_amount);
 
@@ -529,9 +539,9 @@ const header = document.querySelector("header"),
               }
 
               if (dialog.color.alpha == 255) {
-                addClass(elements.variables[editing].parentElement, "transparency");
-              } else {
                 removeClass(elements.variables[editing].parentElement, "transparency");
+              } else {
+                addClass(elements.variables[editing].parentElement, "transparency");
               }
 
               elements.variables[editing].style.background = dialog.color.cssrgb;
@@ -577,7 +587,7 @@ const header = document.querySelector("header"),
                 };
 
             if (editing != "chat_wallpaper" && defaults[editing]) {
-              paletteColors.push(createPaletteColor(defaults[editing], true));
+              paletteColors.push(createPaletteColor(Color.hex(defaults[editing]), true));
             }
 
             for (let k = 0; k < theme_palette.length; k++) {
@@ -854,12 +864,16 @@ addEventListener("keydown", function(event) {
   }
 });
 
-addEventListener("dragenter", function() {
+document.body.addEventListener("dragenter", function() {
   addClass(drag_hint, "shown");
 });
 
-addEventListener("dragleave", function() {
-  removeClass(drag_hint, "shown");
+document.addEventListener("dragleave", function(event) {
+  if (event.screenX == 0 && event.screenY == 0 &&
+      event.clientX == 0 && event.clientY == 0 &&
+      event.pageY == 0 && event.pageY == 0) {
+    removeClass(drag_hint, "shown");
+  }
 });
 
 document.body.append(drag_hint);

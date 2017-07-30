@@ -312,7 +312,11 @@
               document.body.className = "loading success";
               setTimeout(function() {
                 document.body.className = "";
-                setBody("welcome");
+                if (!localStorage.openEditorTheme) {
+                  setBody("welcome");
+                } else {
+                  openEditorTheme();
+                }
               }, 500);
             }
           };

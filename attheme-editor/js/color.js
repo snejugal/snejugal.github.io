@@ -430,15 +430,25 @@ Color.cssrgb = function(color) {
   }
 
   if (typeof color == "string" &&
-      color[0] == "#" &&
-      color.length == 7) {
+      color[0] == "#") {
 
-    return Color.cssrgb({
-      red: b10(color.slice(1, 3)),
-      green: b10(color.slice(3, 5)),
-      blue: b10(color.slice(5, 7)),
-      alpha: 255
-    })
+    if (color.length == 7) {
+      return Color.cssrgb({
+        red: b10(color.slice(1, 3)),
+        green: b10(color.slice(3, 5)),
+        blue: b10(color.slice(5, 7)),
+        alpha: 255
+      });
+    }
+
+    if (color.length == 9) {
+      return Color.cssrgb({
+        red: b10(color.slice(3, 5)),
+        green: b10(color.slice(5, 7)),
+        blue: b10(color.slice(7, 9)),
+        alpha: b10(color.slice(1, 3))
+      });
+    }
   }
 };
 

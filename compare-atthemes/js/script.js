@@ -347,4 +347,18 @@ const IMAGE_KEY = Symbol("image"),
           tableContainer.append(table);
           document.body.append(comparedThemes, title, tableContainer);
         }
+      },
+      openEditorTheme = function() {
+        localStorage.openEditorTheme = false;
+        let editorTheme = JSON.parse(localStorage.theme);
+        for (let i = 0; i < variables.length; i++) {
+          let key = variables[i];
+          if (!editorTheme[key]) {
+            editorTheme[key] = defaultVariableValues[key];
+          }
+        }
+        editorTheme[NAME_KEY] = localStorage.themeName;
+        themes.push(editorTheme);
+
+        setBody("selectAnotherTheme");
       };
