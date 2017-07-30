@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+  <html>
+    <meta charset="utf-8">
+    <title>Compare .attheme's</title>
+    <meta name="viewport" content="width = device-width">
+    <meta name="theme-color" content="#4CAF50">
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 24px;
+        background: #4CAF50;
+        color: #fff;
+        font-family: "Roboto Mono", monospace;
+        font-display: monospace;
+        display: flex;
+        flex-direction: column;
+        will-change: padding;
+        transition: padding .3s;
+        min-height: 100vh;
+      }
+
+      body.loading::before {
+        content: "";
+        width: 56px;
+        height: 56px;
+        border: 6px solid #fff;
+        border-top-color: #4CAF50;
+        border-radius: 28px;
+        box-sizing: inherit;
+        margin: auto;
+        animation:
+          loading 1s linear infinite,
+          loading-appear .5s .3s cubic-bezier(.4, 0, .2, 1) backwards;
+        will-change: opacity, transform;
+      }
+
+      body.loading.error::before {
+        animation: loading-disappear .5s cubic-bezier(.4, 0, .2, 1) backwards;
+      }
+
+      body.loading.success {
+        overflow: hidden;
+      }
+
+      body.loading.success::before {
+        animation: loading-disappear-success .5s cubic-bezier(.4, 0, .2, 1) forwards;
+      }
+
+      .loading-error {
+        font-size: 34px;
+        will-change: font-size;
+        transition: font-size .3s;
+        line-height: 1.4;
+      }
+
+      .loading-error.noscript::before {
+        content: "Turn JS on so the app can work";
+        animation: loading-error-noscript 1.1s .5s linear backwards;
+        will-change: content;
+      }
+
+      .loading-error::after {
+        content: "";
+        width: 2px;
+        height: 47.6px;
+        background: #fff;
+        animation: loading-error-cursor 1s steps(2, start) infinite;
+        display: inline-block;
+        vertical-align: top;
+        will-change: opacity;
+      }
+
+      @keyframes loading-appear {
+        0% {
+          transform: scale(0) rotate(0deg);
+          opacity: 0;
+        }
+
+        100% {
+          transform: scale(1) rotate(270deg);
+          opacity: 1;
+        }
+      }
+
+      @keyframes loading-disappear {
+        0% {
+          transform: scale(1) rotate(0);
+          opacity: 1;
+        }
+
+        100% {
+          transform: scale(0) rotate(270deg);
+          opacity: 0;
+        }
+      }
+
+      @keyframes loading-disappear-success {
+        0% {
+          transform: scale(1) rotate(0);
+          opacity: 1;
+        }
+
+        100% {
+          transform: scale(10) rotate(270deg);
+          opacity: 0;
+        }
+      }
+
+      @keyframes loading {
+        0% {
+          transform: rotate(0deg);
+        }
+
+        100% {
+          transform: rotate(1turn);
+        }
+      }
+
+      @keyframes loading-error-cursor {
+        0% {
+          opacity: 1;
+        }
+
+        100% {
+          opacity: 0;
+        }
+      }
+
+      @keyframes loading-error-noscript {
+        0% {
+          content: "";
+        }
+
+        3.3% {
+          content: "T";
+        }
+
+        6.6% {
+          content: "Tu";
+        }
+
+        9.9% {
+          content: "Tur";
+        }
+
+        13.2% {
+          content: "Turn";
+        }
+
+        16.5% {
+          content: "Turn ";
+        }
+
+        19.8% {
+          content: "Turn J";
+        }
+
+        23.1% {
+          content: "Turn JS";
+        }
+
+        23.1% {
+          content: "Turn JS ";
+        }
+
+        26.4% {
+          content: "Turn JS o";
+        }
+
+        29.7% {
+          content: "Turn JS on";
+        }
+
+        33% {
+          content: "Turn JS on ";
+        }
+
+        36.3% {
+          content: "Turn JS on s";
+        }
+
+        39.6% {
+          content: "Turn JS on so";
+        }
+
+        42.9% {
+          content: "Turn JS on so t";
+        }
+
+        46.2% {
+          content: "Turn JS on so th";
+        }
+
+        49.5% {
+          content: "Turn JS on so the";
+        }
+
+        52.8% {
+          content: "Turn JS on so the ";
+        }
+
+        56.1% {
+          content: "Turn JS on so the a";
+        }
+
+        59.4% {
+          content: "Turn JS on so the ap";
+        }
+
+        62.7% {
+          content: "Turn JS on so the app";
+        }
+
+        66% {
+          content: "Turn JS on so the app ";
+        }
+
+        69.3% {
+          content: "Turn JS on so the app c";
+        }
+
+        72.5% {
+          content: "Turn JS on so the app ca";
+        }
+
+        75.8% {
+          content: "Turn JS on so the app can";
+        }
+
+        79.1% {
+          content: "Turn JS on so the app can ";
+        }
+
+        82.4% {
+          content: "Turn JS on so the app can w";
+        }
+
+        85.7% {
+          content: "Turn JS on so the app can wo";
+        }
+
+        89% {
+          content: "Turn JS on so the app can wor";
+        }
+
+        92.3% {
+          content: "Turn JS on so the app can wor";
+        }
+
+        100% {
+          content: "Turn JS on so the app can work";
+        }
+      }
+
+      @media (min-width: 768px) {
+        body {
+          padding: 96px;
+        }
+
+        .loading-error {
+          font-size: 56px;
+        }
+
+        .loading-error::after {
+          height: 78.4px;
+        }
+      }
+    </style>
+    <base href="/compare-atthemes/">
+  </html>
+  <body>
+    <noscript class="loading-error noscript"></noscript>
+    <script>
+      "use strict";
+
+      let script = document.createElement("script"),
+          defaults = document.createElement("script"),
+          styles = document.createElement("link"),
+          loadCounter = 0,
+          errorWhenLoading = false,
+          loadError = function() {
+            if (errorWhenLoading) return;
+            errorWhenLoading = true;
+            document.body.className = "loading error";
+
+            setTimeout(function() {
+              document.body.className = "";
+
+              if (!loadCounter) {
+                let warning = document.createElement("div"),
+                    warningText = "Oops, an error occured while loading resources. Could you please reload the page?",
+                    i = 0,
+                    timer = setInterval(function() {
+                      warning.innerHTML += warningText[i++];
+                      if (i == warningText.length) {
+                        clearInterval(timer);
+                      }
+                    }, 37);
+                warning.className = "loading-error sources";
+                document.body.append(warning);
+              }
+            }, 500);
+          },
+          loadSuccess = function() {
+            loadCounter++;
+            if (loadCounter == 3) {
+              document.body.className = "loading success";
+              setTimeout(function() {
+                document.body.className = "";
+                setBody("welcome");
+              }, 500);
+            }
+          };
+
+      script.src = "js/script.js";
+      script.onerror = loadError;
+      script.onload = loadSuccess;
+
+      defaults.src = "js/defaults.js";
+      defaults.onerror = loadError;
+      defaults.onload = loadSuccess;
+
+      styles.href = "css/style.css";
+      styles.rel = "stylesheet";
+      styles.onerror = loadError;
+      styles.onload = loadSuccess;
+
+      document.head.append(script, defaults, styles);
+      document.body.className = "loading";
+      document.querySelector("noscript").remove();
+      document.querySelector("script:nth-child(1)").remove();
+    </script>
+  </body>
+</html>
