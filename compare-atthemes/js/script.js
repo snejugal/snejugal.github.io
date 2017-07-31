@@ -172,12 +172,16 @@ const IMAGE_KEY = Symbol("image"),
           if (key == "chat_wallpaper") {
             if (themes[0][IMAGE_KEY] && themes[1][IMAGE_KEY]) {
               if (themes[0][IMAGE_KEY] == themes[1][IMAGE_KEY]) {
-                compareResults.areChatWallpapersTheSame = true;
+                compareResults.areSimilar.chat_wallpaper = true;
+                similarVariablesAmount++;
+                continue;
               } else {
-                compareResults.areChatWallpapersTheSame = false;
+                compareResults.areSimilar.chat_wallpaper = false;
+                continue;
               }
             } else if (themes[0][IMAGE_KEY] || themes[1][IMAGE_KEY]) {
-              compareResults.areChatWallpapersTheSame = false;
+              compareResults.areSimilar.chat_wallpaper = false;
+              continue;
             }
           }
 
@@ -238,13 +242,15 @@ const IMAGE_KEY = Symbol("image"),
           document.body.classList.add("welcome-screen", "select-another-theme");
           elements.openThemesButton = openThemesLabel;
           elements.openThemesButtonInput = openThemesInput;
+
+          document.body.append(dragHint);
         } else if (name == "welcome") {
           let title = createElement("h1.welcome-screen__title", "Compare .attheme's", {
                 click(event) {
                   event.preventDefault();
                 }
               }),
-              description = createElement("p.welcome-screen__description", "Seen a theme that looks like someone else's one or even yours? This tool will help you find out whether they are the same.", {
+              description = createElement("p.welcome-screen__description", "Seen a theme that seems to be created by someone else but you think it's yours? This tool will help you find out whether they are the same.", {
                 click(event) {
                   event.preventDefault();
                 }
@@ -284,6 +290,8 @@ const IMAGE_KEY = Symbol("image"),
           description = null;
           openThemesInput = null;
           openThemesLabel = null;
+
+          document.body.append(dragHint);
         } else if (name == "bitLoading") {
           let bitsContainer = createElement(".bits-container", "Comparing themes...<br>"),
               bits = [0, 1],
@@ -300,7 +308,7 @@ const IMAGE_KEY = Symbol("image"),
           document.body.append(bitsContainer);
           document.body.className = "bit-loading";
         } else if (name == "compareResults") {
-          let title = createElement("h1.compare-results__title", `Compare result: ${Math.round(compareResults.similarPercentage * 10000) / 100}% (${compareResults.similarAmount} of ${variables.length})`),
+          let title = createElement("h1.compare-results__title", `Compare result: ${Math.round(compareResults.similarPercentage * 10000) / 100}% (${compareResults.similarAmount} of ${variables.length}) are similar`),
               comparedThemes = createElement("p.compare-results__text", `Compared themes: ${themes[0][NAME_KEY]} and ${themes[1][NAME_KEY]}`),
               tableContainer = createElement(".compare-results__table-container"),
               table = createElement(".compare-results__table");
@@ -321,7 +329,27 @@ const IMAGE_KEY = Symbol("image"),
                 secondThemeColorCell = createElement(".compare-results__table--cell.color"),
                 areSimilarCell = createElement(".compare-results__table--cell.are-similar");
 
-            if (key == "chat_wallpaper") { continue; }
+            if (key == "chat_wallpaper") {
+              if (themes[0][IMAGE_KEY]) {
+                firstThemeColorCell.dataset.hex = "Image";
+                firstThemeColorCell.classList.add("image");
+              } else {
+                firstThemeColorCell.style.setProperty("--color", cssrgb(themes[0][key]));
+                firstThemeColorCell.dataset.hex = hex(themes[0][key]);
+              }
+              if (themes[1][IMAGE_KEY]) {
+                secondThemeColorCell.dataset.hex = "Image";
+                secondThemeColorCell.classList.add("image");
+              } else {
+                secondThemeColorCell.style.setProperty("--color", cssrgb(themes[1][key]));
+                secondThemeColorCell.dataset.hex = hex(themes[1][key]);
+              }
+            } else {
+              firstThemeColorCell.style.setProperty("--color", cssrgb(themes[0][key]));
+              secondThemeColorCell.style.setProperty("--color", cssrgb(themes[1][key]));
+              firstThemeColorCell.dataset.hex = hex(themes[0][key]);
+              secondThemeColorCell.dataset.hex = hex(themes[1][key]);
+            }
 
             if (brightness(overlay(themes[0][key])) > .75) {
               firstThemeColorCell.classList.add("dark-text");
@@ -336,11 +364,6 @@ const IMAGE_KEY = Symbol("image"),
             } else {
               areSimilarCell.classList.add("false");
             }
-
-            firstThemeColorCell.dataset.hex = hex(themes[0][key]);
-            secondThemeColorCell.dataset.hex = hex(themes[1][key]);
-            firstThemeColorCell.style.setProperty("--color", cssrgb(themes[0][key]));
-            secondThemeColorCell.style.setProperty("--color", cssrgb(themes[1][key]));
             row.append(variableNameCell, firstThemeColorCell, secondThemeColorCell, areSimilarCell);
             table.append(row);
           }
@@ -349,7 +372,7 @@ const IMAGE_KEY = Symbol("image"),
         }
       },
       openEditorTheme = function() {
-        localStorage.openEditorTheme = false;
+        localStorage.removeItem("openEditorTheme");
         let editorTheme = JSON.parse(localStorage.theme);
         for (let i = 0; i < variables.length; i++) {
           let key = variables[i];
@@ -361,4 +384,30 @@ const IMAGE_KEY = Symbol("image"),
         themes.push(editorTheme);
 
         setBody("selectAnotherTheme");
-      };
+      },
+      dragHint = createElement(".drop-hint", "Drop two .attheme files here");
+
+addEventListener("dragenter", function() {
+  dragHint.classList.add("shown");
+});
+
+addEventListener("dragleave", function(event) {
+  if (event.screenX == 0 && event.screenY == 0 &&
+      event.clientX == 0 && event.clientY == 0 &&
+      event.pageY == 0 && event.pageY == 0) {
+    dragHint.classList.remove("shown");
+  }
+});
+
+document.addEventListener("dragover", function(event) {
+  event.preventDefault();
+});
+
+document.addEventListener("drop", function(event) {
+  dragHint.classList.remove("shown");
+  event.preventDefault();
+
+  if (document.body.className) {
+    loadThemes(event.dataTransfer.files);
+  }
+});

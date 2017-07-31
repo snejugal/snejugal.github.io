@@ -5,6 +5,29 @@ body {
   margin: auto;
 }
 
+.drop-hint {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(76, 175, 80, .9);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 56px;
+  z-index: -1;
+  transition: opacity .3s, z-index 0s .3s;
+  opacity: 0;
+}
+
+.drop-hint.shown {
+  z-index: 4;
+  opacity: 1;
+  transition: opacity .3s, z-index 0s 0s;
+}
+
 .welcome-screen {
   background-image: url("../images/palettes.svg");
   background-size: 125%;
@@ -204,6 +227,11 @@ body {
   position: relative;
   background-image: url("../images/transparency.svg");
   background-size: 12px 12px;
+}
+
+.compare-results__table--cell.color.image {
+  color: #4CAF50;
+  --color: #fff;
 }
 
 .compare-results__table--cell.color::before {
