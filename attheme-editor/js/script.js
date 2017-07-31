@@ -793,7 +793,11 @@ const header = document.querySelector("header"),
         }, 0);
         return variable_container;
       },
-      drag_hint = createElement(".drag", "Drop an .attheme file here");
+      drag_hint = createElement(".drag", "Drop an .attheme file here", {
+        click() {
+          removeClass(this, "shown");
+        }
+      });
 
 if (!localStorage.theme) {
   set_workplace("welcome");
@@ -864,11 +868,11 @@ addEventListener("keydown", function(event) {
   }
 });
 
-document.body.addEventListener("dragenter", function() {
+addEventListener("dragenter", function() {
   addClass(drag_hint, "shown");
 });
 
-document.addEventListener("dragleave", function(event) {
+addEventListener("dragleave", function(event) {
   if (event.screenX == 0 && event.screenY == 0 &&
       event.clientX == 0 && event.clientY == 0 &&
       event.pageY == 0 && event.pageY == 0) {
