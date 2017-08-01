@@ -13,6 +13,8 @@
   chats_message: "actionBarDefault",
   chats_muteIcon: "chats_actionMessage",
   chats_name: "actionBarDefault",
+  chats_pinnedIcon: "chats_pinnedIcon",
+  chats_pinnedOverlay: "chats_pinnedIcon",
   chats_secretIcon: "chats_secretName",
   chats_secretName: "chats_secretName",
   chats_sentCheck: "actionBarDefault",

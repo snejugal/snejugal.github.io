@@ -31,10 +31,6 @@
   background: #F44336;
 }
 
-.workplace_button.green {
-  background: #4caf50;
-}
-
 .workplace_button.download-button {
   position: fixed;
   bottom: 24px;

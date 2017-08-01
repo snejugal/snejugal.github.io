@@ -203,14 +203,15 @@ const header = document.querySelector("header"),
                     file_content = null;
                   }
                 }),
-                CompareWithAnotherThemeButton = createElement("button.workplace_button.green", {
+                CompareWithAnotherThemeButton = createElement("button.workplace_button", {
                   type: "button",
                   innerHTML: "Compare with another theme",
                   title: "Go to Compare .attheme's tool with this theme as one of themes to compare"
                 }, {
                   click() {
                     localStorage.openEditorTheme = true;
-                    location.href = "/compare-atthemes/";
+                    // location.href = "/compare-atthemes/";
+                    window.open("/compare-atthemes/");
                   }
                 }),
                 close_button = createElement("button.workplace_button.red", {
