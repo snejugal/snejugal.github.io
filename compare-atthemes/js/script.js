@@ -192,7 +192,7 @@ const IMAGE_KEY = Symbol("image"),
               difference = Math.sqrt((red[1] - red[0]) ** 2 + (green[1] - green[0]) ** 2 + (blue[1] - blue[0]) ** 2 + (alpha[1] - alpha[0]) ** 2);
               console.log(key, difference);
 
-          if (difference <= 102) {
+          if (difference <= 51) {
             compareResults.areSimilar[key] = true;
             similarVariablesAmount++;
           } else {
