@@ -1,0 +1,45 @@
+<meta name="viewport" content="width=device-width">
+<h1>Extract attheme wallpaper</h1>
+<input type="file" accept=".attheme">
+<script src="attheme.min.js" defer></script>
+<script>
+  const readFile = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        const CHUNK_SIZE = 0x8000,
+          chars = new Uint8Array(reader.result),
+          length = chars.length;
+
+        let content = "";
+
+        for (let i = 0; i < length; i += CHUNK_SIZE) {
+          let slice = chars.subarray(i, Math.min(i + CHUNK_SIZE, length));
+          content += String.fromCharCode.apply(null, slice);
+        }
+
+        resolve(content);
+      };
+      reader.onerror = () => reject(new Error("Couldn't read the file"));
+
+      reader.readAsArrayBuffer(file);
+    });
+  };
+  document.querySelector("input").addEventListener("change", function() {
+    readFile(this.files[0])
+      .then(content => {
+        const theme = new Attheme(content);
+        if (theme[Attheme.IMAGE_KEY]) {
+          const a = document.createElement("a");
+          a.download = this.files[0].name.slice(0, -8) + " wallpaper.jpg";
+          a.href = "data:image/jpg;base64," + btoa(theme[Attheme.IMAGE_KEY]);
+          document.body.append(a);
+          a.click();
+          a.remove();
+        } else {
+          alert("No wallpaper");
+        }
+      });
+  });
+</script>
