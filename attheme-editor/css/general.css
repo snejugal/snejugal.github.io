@@ -40,7 +40,7 @@ header {
   background: #fff;
 }
 
-header.full-width {
+.full-width {
   width: 100vw;
 }
 
@@ -189,9 +189,13 @@ noscript {
   padding: 24px;
 }
 
+.snackbar a {
+  color: #2196f3;
+}
+
 @keyframes loading {
   0% {
-    transform: rotate(0turn);
+    transform: rotate(0);
   }
 
   100% {
