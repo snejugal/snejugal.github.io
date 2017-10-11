@@ -190,7 +190,6 @@ const IMAGE_KEY = Symbol("image"),
               blue = [themes[0][key].blue, themes[1][key].blue],
               alpha = [themes[0][key].alpha, themes[1][key].alpha],
               difference = Math.sqrt((red[1] - red[0]) ** 2 + (green[1] - green[0]) ** 2 + (blue[1] - blue[0]) ** 2 + (alpha[1] - alpha[0]) ** 2);
-              console.log(key, difference);
 
           if (difference <= 51) {
             compareResults.areSimilar[key] = true;
