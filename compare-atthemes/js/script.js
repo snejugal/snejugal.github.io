@@ -75,7 +75,7 @@ const IMAGE_KEY = Symbol("image"),
               theme = {};
 
           for (let i = 0; i < variables.length; i++) {
-            theme[variables[i]] = defaultVariableValues[variables[i]];
+            theme[variables[i]] = defaultVariablesValues[variables[i]];
           }
 
           for (let i = 0; i < rows.length; i++) {
@@ -94,7 +94,7 @@ const IMAGE_KEY = Symbol("image"),
                 }
               }
 
-              if (defaultVariableValues[variable]) {
+              if (defaultVariablesValues[variable]) {
                 theme[variable] = {
                   alpha: b10(value.slice(0, 2)),
                   red: b10(value.slice(2, 4)),
@@ -376,7 +376,7 @@ const IMAGE_KEY = Symbol("image"),
         for (let i = 0; i < variables.length; i++) {
           let key = variables[i];
           if (!editorTheme[key]) {
-            editorTheme[key] = defaultVariableValues[key];
+            editorTheme[key] = defaultVariablesValues[key];
           }
         }
         editorTheme[NAME_KEY] = localStorage.themeName;
@@ -384,7 +384,13 @@ const IMAGE_KEY = Symbol("image"),
 
         setBody("selectAnotherTheme");
       },
-      dragHint = createElement(".drop-hint", "Drop two .attheme files here");
+      dragHint = createElement(".drop-hint", "Drop two .attheme files here"),
+      variables = Object.keys(defaultVariablesValues).sort().filter((variable) => {
+        if (variable == "chat_outBroadcast" || variable == "chat_mediaBroadcast") {
+          return false;
+        }
+        return true;
+      });
 
 addEventListener("dragenter", function() {
   dragHint.classList.add("shown");
