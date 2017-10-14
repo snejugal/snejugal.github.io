@@ -106,7 +106,7 @@
 
 .workplace_add-variable-container.fixed {
   position: fixed;
-  top: 0px;
+  top: 0;
   width: 100%;
   animation: fixing .3s both 1;
 }
@@ -337,7 +337,6 @@
   font-weight: 400;
   font-size: 20px;
   margin: 0;
-  z-index: 2;
   word-break: break-all;
   font-family: Roboto Mono, Lucida Console, monospace;
   z-index: 0;

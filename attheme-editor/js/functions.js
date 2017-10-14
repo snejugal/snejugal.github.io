@@ -20,7 +20,7 @@ const get_preview = function(variable) {
                       if (theme[variable]) {
                         changableElements[i].style.fill = Color.cssrgb(theme[variable]);
                       } else {
-                        changableElements[i].style.fill = Color.cssrgb(defaults[variable]);
+                        changableElements[i].style.fill = Color.cssrgb(defaultVariablesValues[variable]);
                       }
                       variable = null;
                     }
@@ -138,10 +138,10 @@ const get_preview = function(variable) {
                   if (!theme[this.innerHTML]) {
                     variables_amount.innerHTML = `${parseInt(variables_amount.innerHTML) + 1} of ${default_variables.length} variables are added to your theme`;
                     theme[this.innerHTML] = {
-                      alpha: defaults[this.innerHTML].alpha,
-                      red: defaults[this.innerHTML].red,
-                      green: defaults[this.innerHTML].green,
-                      blue: defaults[this.innerHTML].blue
+                      alpha: defaultVariablesValues[this.innerHTML].alpha,
+                      red: defaultVariablesValues[this.innerHTML].red,
+                      green: defaultVariablesValues[this.innerHTML].green,
+                      blue: defaultVariablesValues[this.innerHTML].blue
                     }
                     new_variable_element(this.innerHTML, elements.variable_list);
                   }

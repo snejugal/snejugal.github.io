@@ -21,9 +21,11 @@ let workplace = document.querySelector("section"),
     reader = new FileReader();
 
 const header = document.querySelector("header"),
+      default_variables = Object.keys(defaultVariablesValues),
       set_workplace = function(to) {
         switch(to) {
           case "welcome":
+            action_button = null;
             workplace.className = "welcome";
             workplace.innerHTML = "";
 
@@ -128,7 +130,7 @@ const header = document.querySelector("header"),
                     let file_content = "";
 
                     for (let i in theme) {
-                      if (defaults[i] && !Color.are_the_same(theme[i], defaults[i])) {
+                      if (defaultVariablesValues[i] && !Color.are_the_same(theme[i], defaultVariablesValues[i])) {
                         let alpha = b16(theme[i].alpha),
                           red = b16(theme[i].red),
                           blue = b16(theme[i].blue),
@@ -210,8 +212,7 @@ const header = document.querySelector("header"),
                 }, {
                   click() {
                     localStorage.openEditorTheme = true;
-                    // location.href = "/compare-atthemes/";
-                    window.open("/compare-atthemes/");
+                    open("/compare-atthemes/");
                   }
                 }),
                 close_button = createElement("button.workplace_button.red", {
@@ -587,8 +588,8 @@ const header = document.querySelector("header"),
                   return paletteColor;
                 };
 
-            if (editing != "chat_wallpaper" && defaults[editing]) {
-              paletteColors.push(createPaletteColor(Color.hex(defaults[editing]), true));
+            if (editing != "chat_wallpaper" && defaultVariablesValues[editing]) {
+              paletteColors.push(createPaletteColor(Color.hex(defaultVariablesValues[editing]), true));
             }
 
             for (let k = 0; k < theme_palette.length; k++) {
@@ -645,7 +646,7 @@ const header = document.querySelector("header"),
         addClass(header, "full-width");
         document.body.style.paddingRight = scrollbarWidth + "px";
         header.style.paddingRight = scrollbarWidth + "px";
-        action_button.style.right = 24 + scrollbarWidth + "px";
+        if (action_button) action_button.style.right = 24 + scrollbarWidth + "px";
 
         if (type == "variable-edit") {
           if (localStorage.lastTab == "value") {
@@ -680,7 +681,7 @@ const header = document.querySelector("header"),
         document.body.style.paddingRight = "";
         header.className = header.className.replace(" full-width", "");
         header.style.paddingRight = "";
-        action_button.style.right = "";
+        if (action_button) action_button.style.right = "";
         history.onpushstate = null;
         onpopstate = null;
       },
@@ -779,7 +780,7 @@ const header = document.querySelector("header"),
 
         if (isUseless(name)) {
           variable.appendChild(createElement("p.workplace_variable_warning", "This variable isn't used by Telegram."));
-        } else if (!defaults[name]) {
+        } else if (!defaultVariablesValues[name]) {
           variable.appendChild(createElement("p.workplace_variable_warning", "This variable is not standart."));
         }
         elements.variables[name] = variable;
