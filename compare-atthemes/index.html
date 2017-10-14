@@ -278,8 +278,8 @@
     <script>
       "use strict";
 
-      let script = document.createElement("script"),
-          defaults = document.createElement("script"),
+      let defaults = document.createElement("script"),
+          script = document.createElement("script"),
           styles = document.createElement("link"),
           loadCounter = 0,
           errorWhenLoading = false,
@@ -321,20 +321,22 @@
             }
           };
 
-      script.src = "js/script.js";
-      script.onerror = loadError;
-      script.onload = loadSuccess;
-
       defaults.src = "js/default-variables-values.min.js";
+      defaults.defer = true;
       defaults.onerror = loadError;
       defaults.onload = loadSuccess;
+
+      script.src = "js/script.js";
+      script.defer = true;
+      script.onerror = loadError;
+      script.onload = loadSuccess;
 
       styles.href = "css/style.css";
       styles.rel = "stylesheet";
       styles.onerror = loadError;
       styles.onload = loadSuccess;
 
-      document.head.append(script, defaults, styles);
+      document.head.append(defaults, script, styles);
       document.body.className = "loading";
       document.querySelector("noscript").remove();
       document.querySelector("script:nth-child(1)").remove();
