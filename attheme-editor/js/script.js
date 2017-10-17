@@ -3,7 +3,7 @@
 let workplace = document.querySelector("section"),
     theme = (localStorage.theme) ? JSON.parse(localStorage.theme) : {},
     elements = {},
-    image = false,
+    image = localStorage.image || null,
     editing = null,
     suggestions,
     dialog,
@@ -68,17 +68,19 @@ const header = document.querySelector("header"),
                 }, {
                   change() {
                     if (this.files[0].name.slice(-8) == ".attheme") {
-                      reader.onload = function() {
-                        load_theme(reader.result);
-                        set_workplace("workplace");
-                      };
-                      reader.readAsText(this.files[0], "ansi");
-                      themeName.set(this.files[0].name.replace(".attheme", ""));
+                      image = null;
+                      theme = {};
+                      readFile(this.files[0])
+                        .then(load_theme)
+                        .then(() => themeName.set(this.files[0].name.replace(".attheme", "")))
+                        .then(() => set_workplace("workplace"));
                     } else if (this.files[0].name.slice(-15) == ".attheme-editor") {
                       reader.onload = function() {
                         let data = JSON.parse(reader.result);
                         theme = data.theme;
                         theme_palette = data.palette;
+                        image = data.image;
+                        localStorage.image = image;
                         themeName.set(data.name);
                         localStorage.theme = JSON.stringify(theme);
                         localStorage.palette = JSON.stringify(theme_palette);
@@ -167,11 +169,11 @@ const header = document.querySelector("header"),
                     }
 
                     if (localStorage.image) {
-                      file_content += "WPS\n" + localStorage.image;
+                      file_content += `\nWPS\n${atob(localStorage.image)}\nWPE\n`;
                     }
 
                     let file = createElement("a", {
-                      href: "data:text/plain;charset=ansi," + encodeURIComponent(file_content),
+                      href: "data:text/plain;charset=utf8;base64," + btoa(file_content),
                       download: themeName.get() + ".attheme"
                     });
                     document.body.append(file);
@@ -191,7 +193,8 @@ const header = document.querySelector("header"),
                     let file_content = JSON.stringify({
                           name: themeName.get(),
                           theme: theme,
-                          palette: theme_palette
+                          palette: theme_palette,
+                          image: localStorage.image
                         }),
                         file = createElement("a", {
                           href: "data:text/plain," + encodeURIComponent(file_content),
@@ -254,36 +257,13 @@ const header = document.querySelector("header"),
 
             elements.variables = {};
             for (let k in theme) {
+              if (k == "image") return;
               new_variable_element(k, variable_list);
               amount++;
             }
 
             variables_amount.innerHTML = `${amount} of ${default_variables.length} variables are added to your theme`;
 
-            if (image) {
-              let image_removing_warning = createElement(".workplace_warning"),
-                  warning_close = document.createElementNS("http://www.w3.org/2000/svg", "svg"),
-                  warning_close_path = document.createElementNS("http://www.w3.org/2000/svg", "path"),
-                  warning_text = createElement(".workplace_warning_text", "The theme's wallpaper will be removed after downloading. You'll need to add it with the in-app editor.");
-
-              warning_close.setAttribute("class", "workplace_warning_close");
-              warning_close.setAttribute("viewBox", "0 0 24 24");
-              warning_close_path.setAttribute("d", "M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z");
-
-              warning_close.addEventListener("click", function() {
-                elements.warning.remove();
-                delete elements.warning;
-              });
-
-              warning_close.append(warning_close_path);
-              image_removing_warning.append(warning_text, warning_close);
-              workplace.append(image_removing_warning);
-              elements.warning = image_removing_warning;
-              image_removing_warning = null;
-              warning_close = null;
-              warning_close_path = null;
-              warning_text = null;
-            }
             buttons.append(close_button, download_for_editing_button, CompareWithAnotherThemeButton);
             add_variable_container.append(add_variable_input, add_variable_suggestions);
             workplace.append(theme_name, buttons, download_button, add_variable_container, variable_list, variables_amount);
@@ -330,7 +310,7 @@ const header = document.querySelector("header"),
               blue: b10(value.slice(6, 8))
             };
           } else if (rows[i] == "WPS") {
-            image = true;
+            localStorage.image = btoa(rows.slice(i + 1, -2).join("\n"));
             break;
           }
         }
@@ -400,7 +380,8 @@ const header = document.querySelector("header"),
             ok.addEventListener("click", function() {
               dialog.container.click();
               theme = {};
-              image = false;
+              image = null;
+              localStorage.removeItem("image");
               localStorage.removeItem("theme");
               localStorage.removeItem("themeName");
               set_workplace("welcome");
@@ -894,22 +875,23 @@ document.addEventListener("drop", function(event) {
 
   for (let i = 0; i < event.dataTransfer.files.length; i++) {
     if (event.dataTransfer.files[i].name.slice(-8) == ".attheme") {
-      image = false;
+      image = null;
       theme = {};
-      reader.onload = function() {
-        load_theme(reader.result);
-        set_workplace("workplace");
-      };
-      reader.readAsText(event.dataTransfer.files[i]);
-      themeName.set(event.dataTransfer.files[i].name.replace(".attheme", ""));
+      const name = event.dataTransfer.files[i].name.replace(".attheme", "");
+      readFile(event.dataTransfer.files[i])
+        .then(load_theme)
+        .then(() => themeName.set(name))
+        .then(() => set_workplace("workplace"));
       return;
     } else if (event.dataTransfer.files[i].name.slice(-15) == ".attheme-editor") {
-      image = false;
+      image = null;
       theme = {};
       reader.onload = function() {
         let data = JSON.parse(reader.result);
         theme = data.theme;
         theme_palette = data.palette;
+        image = data.image;
+        localStorage.image = image;
         themeName.set(data.name);
         localStorage.theme = JSON.stringify(theme);
         localStorage.palette = JSON.stringify(theme_palette);

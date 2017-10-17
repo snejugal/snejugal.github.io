@@ -201,4 +201,27 @@ const get_preview = function(variable) {
 
             snackbarContainer.appendChild(snackbar);
             document.body.appendChild(snackbarContainer);
+      },
+      readFile = (file) => {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+
+          reader.onload = () => {
+            const CHUNK_SIZE = 0x8000,
+              chars = new Uint8Array(reader.result),
+              length = chars.length;
+
+            let content = "";
+
+            for (let i = 0; i < length; i += CHUNK_SIZE) {
+              let slice = chars.subarray(i, Math.min(i + CHUNK_SIZE, length));
+              content += String.fromCharCode(...slice);
+            }
+
+            resolve(content);
+          };
+          reader.onerror = () => reject(new Error("Couldn't read the file"));
+
+          reader.readAsArrayBuffer(file);
+        });
       };
