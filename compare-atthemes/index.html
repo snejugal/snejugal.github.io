@@ -278,6 +278,16 @@
     <script>
       "use strict";
 
+      onerror = function(msg, src, l, c) {
+        document.write("A problem has been detected and Compare .attheme's has been shut down to prevent damage to your computer.<br><br>");
+        document.write("The problem seems to be caused by the following file: " + src);
+        document.write("<br><br>");
+        document.write(msg);
+        document.write("<br><br>");
+        document.write("Techical Information:<br><br>");
+        document.write("*** STOP: " + l + ":" + c);
+      };
+
       let defaults = document.createElement("script"),
           script = document.createElement("script"),
           styles = document.createElement("link"),
