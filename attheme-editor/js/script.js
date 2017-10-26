@@ -21,7 +21,7 @@ let workplace = document.querySelector("section"),
     reader = new FileReader();
 
 const header = document.querySelector("header"),
-      default_variables = Object.keys(defaultVariablesValues),
+      default_variables = Object.keys(defaultVariablesValues).sort(),
       set_workplace = function(to) {
         switch(to) {
           case "welcome":
@@ -172,8 +172,15 @@ const header = document.querySelector("header"),
                       file_content += `\nWPS\n${atob(localStorage.image)}\nWPE\n`;
                     }
 
+                    const buffer = new Uint8Array(file_content.length);
+                    for (let i = 0; i < file_content.length; i++) {
+                      buffer[i] = file_content.charCodeAt(i);
+                    }
+
+                    const blob = URL.createObjectURL(new File([buffer], themeName.get() + ".attheme"));
+
                     let file = createElement("a", {
-                      href: "data:text/plain;charset=utf8;base64," + btoa(file_content),
+                      href: blob,
                       download: themeName.get() + ".attheme"
                     });
                     document.body.append(file);
@@ -310,7 +317,7 @@ const header = document.querySelector("header"),
               blue: b10(value.slice(6, 8))
             };
           } else if (rows[i] == "WPS") {
-            localStorage.image = btoa(rows.slice(i + 1, -2).join("\n"));
+            localStorage.image = btoa(rows.slice(i + 1, rows.indexOf("WPE")).join("\n"));
             break;
           }
         }
