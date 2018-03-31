@@ -1,0 +1,142 @@
+* {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: #ff9800;
+  color: rgba(255, 255, 255, .9);
+  font-family: Roboto Mono, monospace;
+  display: flex;
+  min-height: 100vh;
+  font-size: 16px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+::selection {
+  background: rgba(0, 0, 0, .1);
+  color: inherit;
+}
+
+.content {
+  max-width: 480px;
+  margin: auto;
+  padding: 32px 24px;
+}
+
+.title {
+  font-weight: 400;
+  font-size: 36px;
+  margin: 0 0 24px;
+  animation-name: appear;
+  animation-duration: .45s;
+  animation-timing-function: cubic-bezier(0.4, 0.0, 0.2, 1);
+  animation-fill-mode: backwards;
+}
+
+.link {
+  color: #ffffff;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, .25);
+  padding-bottom: 0.1em;
+  transition-property: opacity, border-bottom-width, border-bottom-color;
+  transition-timing-function: cubic-bezier(0.4, 0.0, 0.2, 1);
+  transition-duration: .3s;
+}
+
+.link:focus:not(:active) {
+  border-bottom: 2px solid #ffffff;
+}
+
+.link:hover {
+  opacity: .75;
+}
+
+.link:active {
+  opacity: .25;
+}
+
+.paragraph {
+  margin: 0 0 24px;
+  animation-name: appear;
+  animation-duration: .45s;
+  animation-timing-function: cubic-bezier(0.4, 0.0, 0.2, 1);
+  animation-fill-mode: backwards;
+  animation-delay: .45s;
+}
+
+.button {
+  display: flex;
+  width: calc(100% - 4px);
+  background-color: transparent;
+  color: #ffffff;
+  height: 36px;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  cursor: default;
+  border-radius: 2px;
+  margin: 0 0 24px;
+  user-select: none;
+  animation-name: appear;
+  animation-duration: .45s;
+  animation-timing-function: cubic-bezier(0.4, 0.0, 0.2, 1);
+  animation-fill-mode: backwards;
+  animation-delay: .9s;
+  transition-property: opacity, color, background-color;
+  transition-timing-function: cubic-bezier(0.4, 0.0, 0.2, 1);
+  transition-duration: .3s;
+  border: 2px solid #ffffff;
+}
+
+.button:hover,
+.button:focus {
+  background-color: #ffffff;
+  color: #ff9800;
+}
+
+.button:active {
+  opacity: .5;
+}
+
+.image {
+  width: auto;
+  margin: auto;
+  display: block;
+  border-radius: 2px;
+  box-shadow: 0 16px 64px rgba(0, 0, 0, .15);
+  animation-name: appear;
+  animation-duration: .45s;
+  animation-timing-function: cubic-bezier(0.4, 0.0, 0.2, 1);
+  animation-fill-mode: backwards;
+  animation-delay: 1.35s;
+  max-height: calc(100vh - 64px);
+  max-width: 100%;
+}
+
+@media (min-width: 936px), (orientation: landscape) {
+  @supports (display: grid) {
+    .content {
+      max-width: 848px;
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      grid-gap: 48px;
+    }
+
+    .article {
+      margin: auto;
+    }
+
+    .button {
+      margin-top: 48px;
+    }
+  }
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 256px, 0);
+  }
+}

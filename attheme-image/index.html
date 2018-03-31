@@ -1,45 +1,63 @@
-<meta name="viewport" content="width=device-width">
-<h1>Extract attheme wallpaper</h1>
-<input type="file" accept=".attheme">
-<script src="attheme.min.js" defer></script>
-<script>
-  const readFile = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Introducing @atthemeimagebot</title>
+    <meta name="theme-color" content="#ff9800">
+    <link rel="shortcut icon" href="./favicon.png">
+  </head>
+  <body>
+    <main class="content">
+      <article class="article">
+        <h1 class="title">
+          Introducing
+          <a class="link" href="tg://resolve?domain=atthemeimagebot">
+            @attheme&shy;image&shy;bot
+          </a>
+        </h1>
 
-      reader.onload = () => {
-        const CHUNK_SIZE = 0x8000,
-          chars = new Uint8Array(reader.result),
-          length = chars.length;
+        <p class="paragraph">
+          Using <a class="link" href="tg://resolve?domain=atthemeimagebot">this
+          new bot</a>, you can easily extract wallpapers from .attheme files
+          and set your wallpaper of an .attheme with no compression.
+        </p>
 
-        let content = "";
+        <a class="button" href="tg://resolve?domain=atthemeimagebot">
+          Try the bot
+        </a>
+      </article>
 
-        for (let i = 0; i < length; i += CHUNK_SIZE) {
-          let slice = chars.subarray(i, Math.min(i + CHUNK_SIZE, length));
-          content += String.fromCharCode.apply(null, slice);
-        }
+      <img class="image" src="./bot-usage.png" alt="Usage of the bot">
+    </main>
 
-        resolve(content);
-      };
-      reader.onerror = () => reject(new Error("Couldn't read the file"));
+    <script type="module">
+      if (`IntersectionObserver` in window) {
+        const image = document.querySelector(`img`);
 
-      reader.readAsArrayBuffer(file);
-    });
-  };
-  document.querySelector("input").addEventListener("change", function() {
-    readFile(this.files[0])
-      .then(content => {
-        const theme = new Attheme(content);
-        if (theme[Attheme.IMAGE_KEY]) {
-          const a = document.createElement("a");
-          a.download = this.files[0].name.slice(0, -8) + " wallpaper.jpg";
-          a.href = "data:image/jpg;base64," + btoa(theme[Attheme.IMAGE_KEY]);
-          document.body.append(a);
-          a.click();
-          a.remove();
-        } else {
-          alert("No wallpaper");
-        }
-      });
-  });
-</script>
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach(({ isIntersecting, target }) => {
+              if (isIntersecting) {
+                target.src = target.dataset.src;
+                delete target.dataset.src;
+
+                observer.unobserve(target);
+              }
+            });
+          },
+          {
+            threshold: 0,
+          }
+        );
+
+        image.dataset.src = image.src;
+        image.src = null;
+
+        observer.observe(image);
+      }
+    </script>
+
+    <link rel="stylesheet" href="./style.css">
+  </body>
+</html>
